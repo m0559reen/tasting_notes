@@ -137,6 +137,20 @@ select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .savebar .btn{flex:1}
 .hidden-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
+/* sessions */
+.sess{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px;background:var(--surface2)}
+.sess-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.sess .field{margin-bottom:12px}
+.sess input[type=text],.sess input[type=date],.sess textarea{background:var(--surface)}
+.sess-view{padding:12px 0;border-top:1px solid var(--line)}
+.sess-view:first-of-type{border-top:0;padding-top:0}
+.sess-view h3{font-size:16px;display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
+.sess-view .when{font-size:13.5px;color:var(--ink2);font-weight:400}
+.sess-view p{margin:6px 0 0;white-space:pre-wrap;word-break:break-word}
+.servepill{padding:0 8px;border-radius:999px;border:1px solid var(--accent);font-size:12px;line-height:18px;white-space:nowrap}
+.dup-hint{margin:-6px 0 12px;font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dup-hint:empty{display:none}
+
 /* backup */
 .stat{display:flex;gap:20px;flex-wrap:wrap;color:var(--ink2);font-size:14px}
 .stat b{color:var(--ink);font-size:20px;margin-right:3px}
@@ -183,7 +197,7 @@ const TAG_GROUPS = [
   { g: '質感・印象', t: ['甘口', 'ドライ', 'オイリー', '滑らか', '力強い', '軽やか', '長い余韻', '樽感強め'] },
 ];
 const PRESET_TAGS = new Set(TAG_GROUPS.flatMap(x => x.t));
-const FIELDS = ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price', 'date', 'place', 'placeName', 'serve', 'color', 'nose', 'palate', 'finish', 'overall'];
+const FIELDS = ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price', 'color', 'nose', 'palate', 'finish'];
 const ICON_GLASS = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8c.6 3 1 5 .2 8-.5 2-1.8 3.2-3.2 3.7V19h3v2H8v-2h3v-4.3C9.6 14.2 8.3 13 7.8 11 7 8 7.4 6 8 3z"/></svg>';
 const ICON_BACK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
 
@@ -261,10 +275,24 @@ const F = { q: '', cat: 'all', tags: [], sort: 'date-desc', tagPanel: false };
 let listScroll = 0;
 let E = null, E0 = '', editKey = '', draftTimer = null, draftRestored = false;
 
-function normalizeNote(n) { n.tags = Array.isArray(n.tags) ? n.tags : []; return n; }
+function cleanSession(o) {
+  return { id: String(o.id || uid()), serve: String(o.serve ?? ''), date: String(o.date ?? ''), place: String(o.place ?? ''), placeName: String(o.placeName ?? ''), comment: String(o.comment ?? '') };
+}
+function newSession(date = today()) { return cleanSession({ date }); }
+function normalizeNote(n) {
+  n.tags = Array.isArray(n.tags) ? n.tags : [];
+  if (Array.isArray(n.sessions)) n.sessions = n.sessions.map(cleanSession);
+  else {   // 旧形式(1ノート=1回の記録)を新形式に変換 (下書き復元用)
+    n.sessions = [cleanSession({ serve: n.serve, date: n.date, place: n.place, placeName: n.placeName, comment: n.overall })];
+    for (const k of ['serve', 'date', 'place', 'placeName', 'overall']) delete n[k];
+  }
+  return n;
+}
+const lastDate = n => n.sessions.reduce((m, s) => (s.date || '') > m ? s.date : m, '');
+const latestSessions = n => [...n.sessions].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 function sortedNotes() {
   const a = [...notes];
-  const byDate = (x, y) => (y.date || '').localeCompare(x.date || '') || y.createdAt - x.createdAt;
+  const byDate = (x, y) => lastDate(y).localeCompare(lastDate(x)) || y.createdAt - x.createdAt;
   switch (F.sort) {
     case 'date-asc': a.sort((x, y) => -byDate(x, y)); break;
     case 'name': a.sort((x, y) => x.name.localeCompare(y.name, 'ja')); break;
@@ -279,7 +307,7 @@ function filteredNotes() {
     if (F.cat !== 'all' && n.category !== F.cat) return false;
     if (F.tags.length && !F.tags.every(t => n.tags.includes(t))) return false;
     if (words.length) {
-      const hay = norm([n.name, n.brand, n.type, n.region, n.placeName, n.place, n.serve, n.color, n.nose, n.palate, n.finish, n.overall, n.tags.join(' ')].join(' '));
+      const hay = norm([n.name, n.brand, n.type, n.region, n.color, n.nose, n.palate, n.finish, n.tags.join(' '), ...n.sessions.flatMap(s => [s.serve, s.place, s.placeName, s.comment])].join(' '));
       return words.every(w => hay.includes(w));
     }
     return true;
@@ -299,7 +327,7 @@ function metaLine(n) {
   if (n.age) p.push(isNum(n.age) ? n.age + '年' : n.age);
   return p.join(' ・ ');
 }
-function snippet(n) { return (n.overall || n.palate || n.nose || '').replace(/\s+/g, ' '); }
+function snippet(n) { const c = latestSessions(n).find(s => s.comment.trim()); return ((c && c.comment) || n.palate || n.nose || '').replace(/\s+/g, ' '); }
 
 /* ---------- ルーティング ---------- */
 function go(hash, replace) {
@@ -313,8 +341,8 @@ async function route() {
   const parts = (location.hash.slice(1) || '/').split('/').filter(Boolean);
   const [a, b] = parts;
   if (a === 'n' && b) return renderDetail(b);
-  if (a === 'new') return openEditor(null, b || null);
-  if (a === 'edit' && b) return openEditor(b, null);
+  if (a === 'new') return openEditor(null, false);
+  if (a === 'edit' && b) return openEditor(b, parts[2] === 'add');
   if (a === 'backup') return renderBackup();
   return renderList();
 }
@@ -341,7 +369,7 @@ function renderList() {
     </div>
     <div class="row">
       <select id="sort" aria-label="並べ替え">
-        ${[['date-desc', '飲んだ日：新しい順'], ['date-asc', '飲んだ日：古い順'], ['name', '銘柄名順'], ['updated', '更新日順']].map(([k, v]) => `<option value="${k}" ${F.sort === k ? 'selected' : ''}>${v}</option>`).join('')}
+        ${[['date-desc', '最後に飲んだ日：新しい順'], ['date-asc', '最後に飲んだ日：古い順'], ['name', '銘柄名順'], ['updated', '更新日順']].map(([k, v]) => `<option value="${k}" ${F.sort === k ? 'selected' : ''}>${v}</option>`).join('')}
       </select>
       <button class="btn small" data-act="tagpanel" id="tagBtn"></button>
     </div>
@@ -383,14 +411,16 @@ function updateList() {
 }
 
 function cardHTML(n) {
-  const tags = n.tags.slice(0, 4).map(t => `<span class="tagpill">${esc(t)}</span>`).join('') + (n.tags.length > 4 ? `<span class="tagpill">+${n.tags.length - 4}</span>` : '');
+  const serves = uniq(latestSessions(n).map(s => s.serve).filter(Boolean));
+  const servePills = serves.slice(0, 4).map(t => `<span class="servepill">${esc(t)}</span>`).join('') + (serves.length > 4 ? `<span class="servepill">+${serves.length - 4}</span>` : '');
+  const tags = n.tags.slice(0, 3).map(t => `<span class="tagpill">${esc(t)}</span>`).join('') + (n.tags.length > 3 ? `<span class="tagpill">+${n.tags.length - 3}</span>` : '');
   return `<a class="card" href="#/n/${esc(n.id)}" data-act="open-note">
     ${n.thumb ? `<img class="thumb" src="${esc(n.thumb)}" alt="" loading="lazy">` : `<div class="ph">${ICON_GLASS}</div>`}
     <div class="card-body">
-      <div class="card-top"><span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span><time>${esc(fmtDate(n.date))}</time></div>
+      <div class="card-top"><span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span><time>${esc(fmtDate(lastDate(n)))}</time></div>
       <h3>${esc(n.name)}</h3>
       <p class="sub">${esc(metaLine(n)) || '&nbsp;'}</p>
-      ${tags ? `<div class="tags">${tags}</div>` : ''}
+      ${servePills || tags ? `<div class="tags">${servePills}${tags}</div>` : ''}
       ${snippet(n) ? `<p class="snip">${esc(snippet(n))}</p>` : ''}
     </div></a>`;
 }
@@ -403,8 +433,13 @@ function renderDetail(id) {
   if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
   document.title = n.name + ' - テイスティングノート';
   const kv = (k, v) => `<dt>${k}</dt><dd class="${v ? '' : 'empty-v'}">${v ? esc(v) : '―'}</dd>`;
-  const same = notes.filter(o => o.id !== n.id && norm(o.name) === norm(n.name)).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  const situation = [n.place, n.placeName].filter(Boolean).join(' / ');
+  const sess = latestSessions(n);
+  const sessHTML = sess.length ? sess.map(s => {
+    const where = [s.place, s.placeName].filter(Boolean).join(' / ');
+    const when = [fmtDate(s.date), where].filter(Boolean).join(' ・ ');
+    return `<div class="sess-view"><h3>${esc(s.serve || '(飲み方未設定)')}<span class="when">${esc(when)}</span></h3>
+      ${s.comment.trim() ? `<p>${esc(s.comment)}</p>` : '<p class="muted">コメントなし</p>'}</div>`;
+  }).join('') : '<p class="muted">まだ記録がありません</p>';
   app.innerHTML = `
   <header class="top">
     <button class="back" data-act="back-list">${ICON_BACK}一覧</button>
@@ -423,18 +458,16 @@ function renderDetail(id) {
   </dl></div>
 
   <div class="section"><h2>テイスティング</h2><dl class="kv">
-    ${kv('色', n.color)}${kv('香り', n.nose)}${kv('味わい', n.palate)}${kv('余韻', n.finish)}${kv('総合', n.overall)}
+    ${kv('色', n.color)}${kv('香り', n.nose)}${kv('味わい', n.palate)}${kv('余韻', n.finish)}
   </dl></div>
 
-  <div class="section"><h2>飲んだ状況</h2><dl class="kv">
-    ${kv('日付', fmtDate(n.date))}${kv('場所', situation)}${kv('飲み方', n.serve)}
-  </dl></div>
-
-  ${same.length ? `<div class="section same"><h2>同じ銘柄の他のノート</h2>${same.map(o => `<a href="#/n/${esc(o.id)}"><time>${esc(fmtDate(o.date))}</time>${esc(snippet(o).slice(0, 60) || o.serve || '(記載なし)')}</a>`).join('')}</div>` : ''}
+  <div class="section"><h2>飲み方ごとの記録（${n.sessions.length}）</h2>
+    ${sessHTML}
+    <div style="margin-top:12px"><button class="btn block" data-act="add-session" data-id="${esc(n.id)}">＋ 飲み方の記録を追加</button></div>
+  </div>
 
   <div class="actions">
-    <button class="btn" data-act="dup" data-id="${esc(n.id)}">同じ銘柄で新しいノートを書く</button>
-    <button class="btn danger" data-act="del" data-id="${esc(n.id)}">削除</button>
+    <button class="btn danger" data-act="del" data-id="${esc(n.id)}">この銘柄のノートを削除</button>
   </div>`;
   window.scrollTo(0, 0);
 }
@@ -443,31 +476,31 @@ function renderDetail(id) {
    編集
    ============================================================ */
 function blankNote() {
-  return { id: uid(), createdAt: Date.now(), updatedAt: Date.now(), category: 'whisky', name: '', brand: '', type: '', region: '', abv: '', age: '', price: '', date: today(), place: '', placeName: '', serve: '', color: '', nose: '', palate: '', finish: '', overall: '', tags: [], photo: '', thumb: '' };
+  return { id: uid(), createdAt: Date.now(), updatedAt: Date.now(), category: 'whisky', name: '', brand: '', type: '', region: '', abv: '', age: '', price: '', color: '', nose: '', palate: '', finish: '', tags: [], photo: '', thumb: '', sessions: [newSession()] };
+}
+function appendSession() {
+  const last = E.sessions[E.sessions.length - 1];
+  E.sessions.push(cleanSession({ date: last?.date || today(), place: last?.place, placeName: last?.placeName }));
 }
 
-async function openEditor(id, fromId) {
+async function openEditor(id, addSess) {
   editKey = 'draft:' + (id || 'new');
   let base;
   if (id) {
     const n = notes.find(x => x.id === id);
     if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
     base = structuredClone(n);
-  } else {
-    base = blankNote();
-    const src = fromId && notes.find(x => x.id === fromId);
-    if (src) for (const k of ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price']) base[k] = src[k];
-  }
-  E0 = JSON.stringify(base);
+  } else base = blankNote();
   E = base;
+  E0 = JSON.stringify(base);
   draftRestored = false;
-  if (!fromId) {
-    try {
-      const d = await metaGet(editKey);
-      if (d && d.data) { E = normalizeNote(d.data); draftRestored = true; }
-    } catch (_) { /* 下書きは無くても動く */ }
-  }
+  try {
+    const d = await metaGet(editKey);
+    if (d && d.data) { E = normalizeNote(d.data); draftRestored = true; }
+  } catch (_) { /* 下書きは無くても動く */ }
+  if (addSess && !draftRestored) { appendSession(); E0 = JSON.stringify(E); }
   renderEditor(!!id);
+  if (addSess && !draftRestored) { const els = document.querySelectorAll('#sessions .sess'); els[els.length - 1]?.scrollIntoView({ block: 'center' }); }
 }
 
 function tagUniverse() {
@@ -483,8 +516,34 @@ function tagPickerHTML() {
 }
 function optList(vals) { return uniq(vals.filter(Boolean)).map(v => `<option value="${esc(v)}">`).join(''); }
 function typeOptionsHTML() { return optList([...(TYPE_SUGGEST[E.category] || []), ...notes.filter(n => n.category === E.category).map(n => n.type)]); }
-function chipRow(field, values) {
-  return `<div class="chips">${values.map(v => `<button type="button" class="chip" data-act="ed-chip" data-f="${field}" data-v="${esc(v)}" aria-pressed="${E[field] === v}">${esc(v)}</button>`).join('')}</div>`;
+
+function sessionHTML(s, i) {
+  const chips = (field, values) => `<div class="chips">${values.map(v => `<button type="button" class="chip" data-act="sess-chip" data-si="${i}" data-f="${field}" data-v="${esc(v)}" aria-pressed="${s[field] === v}">${esc(v)}</button>`).join('')}</div>`;
+  return `<div class="sess" data-i="${i}">
+    <div class="sess-head"><span>飲み方 ${i + 1}${s.serve ? '：' + esc(s.serve) : ''}</span>${E.sessions.length > 1 ? `<button type="button" class="btn small danger" data-act="sess-del" data-si="${i}">削除</button>` : ''}</div>
+    <div class="field"><span class="lbl">飲み方</span>${chips('serve', SERVES)}
+      <input type="text" data-si="${i}" data-sf="serve" value="${esc(s.serve)}" list="dl-serve" aria-label="飲み方（自由入力）" placeholder="自由入力もできます（例：ハイボール 1:3）" style="margin-top:8px" autocomplete="off"></div>
+    <div class="field"><span class="lbl">コメント</span><textarea data-si="${i}" data-sf="comment" rows="3" aria-label="コメント" placeholder="この飲み方での印象・気づき">${esc(s.comment)}</textarea></div>
+    <div class="field"><span class="lbl">日付</span><input type="date" data-si="${i}" data-sf="date" value="${esc(s.date)}" aria-label="日付"></div>
+    <div class="field"><span class="lbl">場所</span>${chips('place', PLACES)}
+      <input type="text" data-si="${i}" data-sf="placeName" value="${esc(s.placeName)}" list="dl-place" aria-label="店名・場所のメモ" placeholder="店名・場所のメモ" style="margin-top:8px" autocomplete="off"></div>
+  </div>`;
+}
+function renderSessions() { $('#sessions').innerHTML = E.sessions.map(sessionHTML).join(''); }
+function syncSession(i) {
+  const s = E.sessions[i], el = document.querySelector(`.sess[data-i="${i}"]`);
+  if (!el) return;
+  el.querySelectorAll('[data-act="sess-chip"]').forEach(c => c.setAttribute('aria-pressed', String(s[c.dataset.f] === c.dataset.v)));
+  const inp = el.querySelector('[data-sf="serve"]'); if (inp && inp !== document.activeElement) inp.value = s.serve;
+  const pl = el.querySelector('[data-sf="placeName"]');
+  const head = el.querySelector('.sess-head span'); if (head) head.textContent = `飲み方 ${i + 1}${s.serve ? '：' + s.serve : ''}`;
+}
+function updateDupHint() {
+  const el = $('#dupHint');
+  if (!el || notes.some(n => n.id === E.id)) return;
+  const k = norm(E.name).trim();
+  const m = k && notes.find(n => norm(n.name) === k);
+  el.innerHTML = m ? `<span>この銘柄はすでに登録されています。</span><button type="button" class="btn small" data-act="dup-open" data-id="${esc(m.id)}">飲み方の記録を追加する</button>` : '';
 }
 
 function renderEditor(isEdit) {
@@ -503,6 +562,7 @@ function renderEditor(isEdit) {
     <div class="field"><span class="lbl">種類</span>
       <div class="chips">${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-act="ed-chip" data-f="category" data-v="${k}" data-req="1" aria-pressed="${E.category === k}">${v}</button>`).join('')}</div></div>
     ${inp('name', '銘柄名 <span style="color:var(--danger)">*</span>', 'autocomplete="off" placeholder="例：山崎 12年 / ボンベイ・サファイア"')}
+    <div id="dupHint" class="dup-hint"></div>
     <div class="two">
       ${inp('brand', '蒸留所・ブランド', 'list="dl-brand" autocomplete="off"')}
       ${inp('region', '産地', 'list="dl-region" autocomplete="off" placeholder="例：スペイサイド"')}
@@ -518,24 +578,23 @@ function renderEditor(isEdit) {
     <datalist id="dl-type">${typeOptionsHTML()}</datalist>
   </div>
 
-  <div class="section"><h2>テイスティング</h2>
+  <div class="section"><h2>テイスティング（銘柄共通）</h2>
     ${ta('color', '色', '例：深みのある琥珀色、無色透明')}
     ${ta('nose', '香り(ノーズ)', '')}
     ${ta('palate', '味わい(パレット)', '')}
     ${ta('finish', '余韻(フィニッシュ)', '')}
-    ${ta('overall', '総合コメント', '')}
   </div>
 
   <div class="section"><h2>フレーバータグ</h2>
     <div id="tagPicker">${tagPickerHTML()}</div>
   </div>
 
-  <div class="section"><h2>飲んだ状況</h2>
-    <div class="field"><label for="f-date">日付</label><input type="date" id="f-date" name="date" value="${esc(E.date)}"></div>
-    <div class="field"><span class="lbl">場所</span>${chipRow('place', PLACES)}</div>
-    ${inp('placeName', '店名・場所のメモ', 'list="dl-place" autocomplete="off"')}
-    <datalist id="dl-place">${optList(notes.map(n => n.placeName))}</datalist>
-    <div class="field"><span class="lbl">飲み方</span>${chipRow('serve', SERVES)}</div>
+  <div class="section"><h2>飲み方ごとの記録</h2>
+    <p class="muted" style="margin-top:0">ロック・ハイボールなど、飲み方ごとにコメントと日付・場所を残せます。</p>
+    <div id="sessions">${E.sessions.map(sessionHTML).join('')}</div>
+    <button type="button" class="btn block" data-act="ed-add-sess">＋ 飲み方を追加</button>
+    <datalist id="dl-serve">${optList([...SERVES, ...notes.flatMap(n => n.sessions.map(s => s.serve))])}</datalist>
+    <datalist id="dl-place">${optList(notes.flatMap(n => n.sessions.map(s => s.placeName)))}</datalist>
   </div>
 
   <div class="section"><h2>写真</h2>
@@ -548,6 +607,7 @@ function renderEditor(isEdit) {
     <button class="btn primary" data-act="ed-save">保存</button>
   </div>
   </div>`;
+  updateDupHint();
   window.scrollTo(0, 0);
 }
 function photoBoxHTML() {
@@ -590,6 +650,8 @@ function processPhoto(file) {
 async function saveNote() {
   if (!E.name.trim()) { toast('銘柄名を入力してください'); $('#f-name')?.focus(); return; }
   E.name = E.name.trim();
+  const kept = E.sessions.filter(s => s.serve.trim() || s.comment.trim() || s.place || s.placeName.trim());
+  E.sessions = kept.length ? kept : E.sessions.slice(0, 1);
   E.updatedAt = Date.now();
   try {
     await dbPut(E);
@@ -614,6 +676,7 @@ const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.p
 async function renderBackup() {
   document.title = 'バックアップ - テイスティングノート';
   let usage = '', persisted = null;
+  const pre = await metaGet('preMigrationBackup').catch(() => null);
   try { const e = await navigator.storage?.estimate?.(); if (e?.usage != null) usage = (e.usage / 1048576).toFixed(1) + ' MB'; } catch (_) {}
   try { persisted = await navigator.storage?.persisted?.(); } catch (_) {}
   app.innerHTML = `
@@ -645,6 +708,14 @@ async function renderBackup() {
     <p class="muted">「統合」は同じノートがあれば新しい方を残し、無いものを追加します。</p>
   </div>
 
+  ${pre ? `<div class="section"><h2>統合前のデータ</h2>
+    <p>${new Date(pre.at).toLocaleString('ja-JP')}に、同じ銘柄のノートを1ページへ統合しました。統合前の${pre.notes.length}件をそのまま保管しています。</p>
+    <div class="btn-col">
+      <button class="btn" data-act="exp-pre">統合前のデータを書き出す（JSON）</button>
+      <button class="btn danger" data-act="del-pre">保管データを削除する</button>
+    </div>
+    <p class="muted">問題なく使えることを確認できたら削除して構いません（写真を含むため容量を使います）。</p></div>` : ''}
+
   ${isStandalone() ? '' : `<div class="section"><h2>アプリとして使う</h2>
     ${deferredInstall ? '<div class="btn-col" style="margin-bottom:10px"><button class="btn" data-act="install">このPCにインストール</button></div>' : ''}
     <ul>
@@ -671,18 +742,25 @@ async function deliverFile(blob, filename) {
 const stamp = () => today().replace(/-/g, '');
 
 async function exportJSON() {
-  const data = { app: 'tasting-notes', version: 1, exportedAt: new Date().toISOString(), customTags, notes };
+  const data = { app: 'tasting-notes', version: 2, exportedAt: new Date().toISOString(), customTags, notes };
   const ok = await deliverFile(new Blob([JSON.stringify(data)], { type: 'application/json' }), `tasting-notes_${stamp()}.json`);
   if (ok) { lastBackup = Date.now(); await metaSet('lastBackup', lastBackup).catch(() => {}); toast('書き出しました'); if ((location.hash || '').startsWith('#/backup')) renderBackup(); }
 }
 function exportCSV() {
-  const head = ['日付', '種類', '銘柄名', '蒸留所・ブランド', 'タイプ', '産地', '度数', '熟成年数', '価格', '場所', '店名・場所メモ', '飲み方', '色', '香り', '味わい', '余韻', '総合', 'タグ'];
+  const head = ['種類', '銘柄名', '蒸留所・ブランド', 'タイプ', '産地', '度数', '熟成年数', '価格', '色', '香り', '味わい', '余韻', 'タグ', '飲み方', '日付', '場所', '店名・場所メモ', 'コメント'];
   const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-  const rows = sortedNotes().map(n => [n.date, CATS[n.category], n.name, n.brand, n.type, n.region, n.abv, n.age, n.price, n.place, n.placeName, n.serve, n.color, n.nose, n.palate, n.finish, n.overall, n.tags.join('・')]);
+  const rows = [];
+  for (const n of sortedNotes()) {
+    const base = [CATS[n.category], n.name, n.brand, n.type, n.region, n.abv, n.age, n.price, n.color, n.nose, n.palate, n.finish, n.tags.join('・')];
+    const ss = latestSessions(n);
+    if (!ss.length) rows.push([...base, '', '', '', '', '']);
+    ss.forEach(x => rows.push([...base, x.serve, x.date, x.place, x.placeName, x.comment]));
+  }
   const csv = '﻿' + [head, ...rows].map(r => r.map(q).join(',')).join('\r\n');
   deliverFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `tasting-notes_${stamp()}.csv`).then(ok => ok && toast('書き出しました'));
 }
 
+/* 取り込み用の整形。旧形式(sessionsなし)のノートは _legacy を付けて後で銘柄ごとに統合する */
 function cleanImported(o) {
   if (!o || typeof o !== 'object' || !o.id || !o.name) return null;
   const n = { id: String(o.id) };
@@ -693,13 +771,46 @@ function cleanImported(o) {
   n.photo = img(o.photo); n.thumb = img(o.thumb);
   n.createdAt = Number(o.createdAt) || Date.now();
   n.updatedAt = Number(o.updatedAt) || n.createdAt;
+  if (Array.isArray(o.sessions)) n.sessions = o.sessions.map(cleanSession);
+  else { n.sessions = [cleanSession({ serve: o.serve, date: o.date, place: o.place, placeName: o.placeName, comment: o.overall })]; n._legacy = true; }
   return n;
 }
+/* 旧形式ノートを「同じ種類・同じ銘柄名」で1つにまとめる */
+function groupLegacy(list) {
+  const out = list.filter(n => !n._legacy);
+  const groups = new Map();
+  for (const n of list.filter(n => n._legacy)) {
+    const key = n.category + '|' + norm(n.name);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(n);
+  }
+  for (const g of groups.values()) out.push(mergeGroup(g));
+  return out;
+}
+function mergeGroup(g) {
+  const byNew = [...g].sort((a, b) => b.updatedAt - a.updatedAt);
+  const chrono = [...g].sort((a, b) => (a.sessions[0].date || '').localeCompare(b.sessions[0].date || '') || a.createdAt - b.createdAt);
+  const base = [...g].sort((a, b) => a.createdAt - b.createdAt)[0];   // 最初に作ったノートのIDを引き継ぐ(端末間で同じIDになる)
+  const m = { id: base.id, createdAt: base.createdAt, updatedAt: byNew[0].updatedAt, category: base.category, photo: '', thumb: '' };
+  for (const k of ['name', 'brand', 'type', 'region', 'abv', 'age', 'price']) m[k] = (byNew.find(n => n[k].trim()) || byNew[0])[k];
+  for (const k of ['color', 'nose', 'palate', 'finish']) {
+    const seen = new Set(), items = [];
+    for (const n of chrono) { const v = n[k].trim(); if (v && !seen.has(v)) { seen.add(v); items.push({ v, s: n.sessions[0] }); } }
+    // ノートごとに内容が違う場合は、失わないよう【日付 飲み方】付きで並べる
+    m[k] = items.length <= 1 ? (items[0]?.v || '') : items.map(({ v, s }) => { const label = [fmtDate(s.date), s.serve].filter(Boolean).join(' '); return label ? `【${label}】${v}` : v; }).join('\n');
+  }
+  const ph = byNew.find(n => n.photo);
+  if (ph) { m.photo = ph.photo; m.thumb = ph.thumb; }
+  m.tags = uniq(chrono.flatMap(n => n.tags));
+  m.sessions = chrono.flatMap(n => n.sessions);
+  return m;
+}
+
 async function importFile(file, mode) {
   let data;
   try { data = JSON.parse(await file.text()); } catch { return toast('JSONとして読み込めませんでした', 3500); }
   if (!data || !Array.isArray(data.notes)) return toast('このアプリのバックアップファイルではありません', 3500);
-  const incoming = data.notes.map(cleanImported).filter(Boolean);
+  const incoming = groupLegacy(data.notes.map(cleanImported).filter(Boolean));
   if (!incoming.length) return toast('読み込めるノートがありませんでした', 3500);
   if (mode === 'replace') {
     if (!await confirmDialog(`いまの${notes.length}件をすべて削除し、バックアップの${incoming.length}件に置き換えます。よろしいですか？`, '置き換える', true)) return;
@@ -740,7 +851,7 @@ document.addEventListener('click', async e => {
     case 'backup': listScroll = window.scrollY; return go('#/backup');
     case 'back-list': return go('#/');
     case 'edit': return go('#/edit/' + id);
-    case 'dup': return go('#/new/' + id);
+    case 'add-session': return go('#/edit/' + id + '/add');
     case 'del': {
       const n = notes.find(x => x.id === id);
       if (n && await confirmDialog(`「${n.name}」のノートを削除します。元に戻せません。`, '削除する', true)) {
@@ -765,6 +876,33 @@ document.addEventListener('click', async e => {
       b.setAttribute('aria-pressed', String(E.tags.includes(v)));
       scheduleDraft(); return;
     case 'ed-addtag': addCustomTag(); return;
+    case 'sess-chip': {
+      const i = +b.dataset.si, f = b.dataset.f, cur = E.sessions[i];
+      cur[f] = cur[f] === v ? '' : v;
+      if (f === 'serve') { const inp = b.closest('.sess').querySelector('[data-sf="serve"]'); if (inp) inp.value = cur.serve; }
+      syncSession(i); scheduleDraft(); return;
+    }
+    case 'sess-del': {
+      const i = +b.dataset.si, cur = E.sessions[i];
+      if ((cur.comment.trim() || cur.serve.trim()) && !await confirmDialog('この飲み方の記録を削除します。よろしいですか？', '削除する', true)) return;
+      E.sessions.splice(i, 1); renderSessions(); scheduleDraft(); return;
+    }
+    case 'ed-add-sess': {
+      appendSession(); renderSessions(); scheduleDraft();
+      const els = document.querySelectorAll('#sessions .sess'); els[els.length - 1]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+    case 'dup-open': await clearDraft(); E = null; go('#/edit/' + id + '/add'); return;
+    case 'exp-pre': {
+      const pre = await metaGet('preMigrationBackup').catch(() => null);
+      if (!pre) return;
+      const data = { app: 'tasting-notes', version: 1, exportedAt: new Date(pre.at).toISOString(), customTags, notes: pre.notes };
+      if (await deliverFile(new Blob([JSON.stringify(data)], { type: 'application/json' }), `tasting-notes_before-merge_${stamp()}.json`)) toast('書き出しました');
+      return;
+    }
+    case 'del-pre':
+      if (await confirmDialog('統合前のデータの保管コピーを削除します。よろしいですか？', '削除する', true)) { await metaDel('preMigrationBackup'); renderBackup(); }
+      return;
     case 'ed-photo': $('#photoInput').click(); return;
     case 'ed-photo-rm': E.photo = ''; E.thumb = ''; $('#photoBox').innerHTML = photoBoxHTML(); scheduleDraft(); return;
     case 'ed-save': return saveNote();
@@ -801,7 +939,12 @@ function addCustomTag() {
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'q') { F.q = t.value; updateList(); return; }
-  if (E && t.name && t.closest('#editor')) { E[t.name] = t.value; scheduleDraft(); }
+  if (E && t.dataset.si !== undefined && t.dataset.sf) {
+    const i = +t.dataset.si; E.sessions[i][t.dataset.sf] = t.value;
+    if (t.dataset.sf === 'serve') syncSession(i);
+    scheduleDraft(); return;
+  }
+  if (E && t.name && t.closest('#editor')) { E[t.name] = t.value; if (t.name === 'name') updateDupHint(); scheduleDraft(); }
 });
 document.addEventListener('change', async e => {
   const t = e.target;
@@ -820,9 +963,24 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferr
 
 /* ---------- 起動 ---------- */
 (async function init() {
+  let migrated = null;
   try {
     db = await openDB();
-    notes = (await dbAll()).map(normalizeNote);
+    const raw = await dbAll();
+    const legacyRaw = raw.filter(n => !Array.isArray(n.sessions));
+    const modern = raw.filter(n => Array.isArray(n.sessions));
+    notes = modern;
+    if (legacyRaw.length) {
+      // 旧形式(1ノート=1回の記録)を、同じ銘柄名ごとに1ページへ統合する
+      try { await metaSet('preMigrationBackup', { at: Date.now(), notes: legacyRaw }); } catch (e) { console.warn('pre-migration backup failed', e); }
+      const conv = legacyRaw.map(cleanImported);
+      const okRaw = legacyRaw.filter((_, i) => conv[i]);
+      const merged = groupLegacy(conv.filter(Boolean));
+      await tx('notes', 'readwrite', s => { okRaw.forEach(n => s.delete(n.id)); merged.forEach(n => s.put(n)); });
+      notes = [...modern, ...merged];
+      migrated = { from: okRaw.length, to: merged.length };
+    }
+    notes = notes.map(normalizeNote);
     customTags = (await metaGet('customTags')) || [];
     lastBackup = (await metaGet('lastBackup')) || 0;
   } catch (err) {
@@ -832,6 +990,7 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferr
   }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
   route();
+  if (migrated) toast(migrated.from === migrated.to ? '新しい形式にデータを更新しました' : `${migrated.from}件のノートを${migrated.to}銘柄に統合しました`, 5000);
 })();
 </script>
 </body>
