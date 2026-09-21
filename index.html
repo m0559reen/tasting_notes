@@ -17,7 +17,7 @@
 :root{
   --bg:#f6f1ea; --surface:#fffdf9; --surface2:#efe7dc; --ink:#2a211b; --ink2:#6b5d51; --line:#ddd1c2;
   --accent:#9a5b1c; --accent-ink:#fff; --accent-soft:#f0dfc8; --danger:#b3372b;
-  --whisky:#9a5b1c; --gin:#3f7d6e; --other:#6d6b8a;
+  --whisky:#9a5b1c; --gin:#3f7d6e; --other:#6d6b8a; --rum:#a8452f; --brandy:#7a3d63; --tequila:#4f7a25; --vodka:#3f6aa0; --brew:#7d6f17;
   --shadow:0 1px 2px rgba(60,40,20,.08),0 4px 14px rgba(60,40,20,.06);
   --radius:14px;
   --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",system-ui,sans-serif;
@@ -27,14 +27,14 @@
   :root:not([data-theme="light"]){
     --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
     --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
-    --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8;
+    --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8; --rum:#e08a72; --brandy:#c98bb0; --tequila:#9bc46a; --vodka:#7fa8dc; --brew:#d6c66a;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
   }
 }
 :root[data-theme="dark"]{
   --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
   --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
-  --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8;
+  --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8; --rum:#e08a72; --brandy:#c98bb0; --tequila:#9bc46a; --vodka:#7fa8dc; --brew:#d6c66a;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -97,7 +97,7 @@ select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .sub{margin:0;color:var(--ink2);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .snip{margin:4px 0 0;font-size:13.5px;color:var(--ink2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .badge{display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;line-height:20px;color:#fff}
-.badge.whisky{background:var(--whisky)} .badge.gin{background:var(--gin)} .badge.other{background:var(--other)}
+.badge.whisky{background:var(--whisky)} .badge.gin{background:var(--gin)} .badge.rum{background:var(--rum)} .badge.brandy{background:var(--brandy)} .badge.tequila{background:var(--tequila)} .badge.vodka{background:var(--vodka)} .badge.brew{background:var(--brew)} .badge.other{background:var(--other)}
 :root[data-theme="dark"] .badge{color:#1c1611}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge{color:#1c1611}}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
@@ -179,13 +179,18 @@ select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns=
    ============================================================ */
 
 /* ---------- 定数 ---------- */
-const CATS = { whisky: 'ウイスキー', gin: 'ジン', other: 'その他' };
+const CATS = { whisky: 'ウイスキー', gin: 'ジン', rum: 'ラム', brandy: 'ブランデー', tequila: 'テキーラ', vodka: 'ウォッカ', brew: '醸造酒', other: 'その他' };
 const PLACES = ['自店', '他店', '自宅', 'イベント', 'その他'];
 const SERVES = ['ストレート', 'ロック', 'トワイスアップ', '水割り', 'ソーダ割り', 'ジントニック', 'カクテル', 'その他'];
 const TYPE_SUGGEST = {
   whisky: ['シングルモルト', 'ブレンデッド', 'ブレンデッドモルト', 'グレーン', 'バーボン', 'ライ', 'テネシー', 'ジャパニーズ', 'アイリッシュ', 'カナディアン'],
   gin: ['ロンドンドライ', 'プリマス', 'オールドトム', 'ニューウェスタン', 'ジェネヴァ', 'クラフト', 'ジャパニーズクラフト', 'シップスミス', 'スロージン'],
-  other: ['ラム', 'テキーラ', 'ブランデー', 'ウォッカ', 'リキュール', 'ジャパニーズ焼酎'],
+  rum: ['ホワイト', 'ゴールド', 'ダーク', 'スパイスド', 'アグリコール', 'ジャパニーズ'],
+  brandy: ['コニャック', 'アルマニャック', 'カルヴァドス', 'グラッパ', 'フルーツブランデー', 'VS', 'VSOP', 'XO'],
+  tequila: ['ブランコ', 'レポサド', 'アネホ', 'エクストラアネホ', 'ホベン', 'メスカル'],
+  vodka: ['プレーン', 'フレーバード', 'ライ麦', 'ジャガイモ', '小麦'],
+  brew: ['日本酒', 'ワイン', 'ビール', 'クラフトビール', 'シードル', 'マッコリ', 'ミード'],
+  other: ['リキュール', '焼酎', '泡盛', 'ベルモット', 'アマーロ'],
 };
 const TAG_GROUPS = [
   { g: 'フルーツ', t: ['シトラス', '青りんご・洋梨', 'トロピカル', '赤い果実', 'ドライフルーツ', 'レーズン'] },
@@ -193,7 +198,9 @@ const TAG_GROUPS = [
   { g: '甘み・菓子', t: ['バニラ', 'キャラメル', '蜂蜜', 'チョコレート', 'ナッツ', '麦芽(モルト)', 'クリーミー'] },
   { g: 'スパイス・木', t: ['スパイシー', 'ペッパー', 'シナモン', 'ジンジャー', 'ウッディ・オーク', 'シェリー樽'] },
   { g: '燻製・海', t: ['スモーキー', 'ピーティ', 'ヨード・潮', 'タール・焦げ', 'ミネラル'] },
-  { g: 'ボタニカル', t: ['ジュニパー', 'コリアンダー', 'アンジェリカ', 'カルダモン', '柚子', '山椒', 'ローズ', 'ラベンダー', 'リコリス'], not: ['whisky'] },
+  { g: 'ボタニカル', t: ['ジュニパー', 'コリアンダー', 'アンジェリカ', 'カルダモン', '柚子', '山椒', 'ローズ', 'ラベンダー', 'リコリス'], only: ['gin', 'vodka', 'other'] },
+  { g: '原料由来', t: ['糖蜜・黒糖', 'サトウキビ', 'アガベ', 'ぶどう', '穀物', '草っぽい', '塩気'], only: ['rum', 'brandy', 'tequila', 'vodka'] },
+  { g: '醸造酒の特徴', t: ['酸味', '果実味', '旨味', '渋み', '発泡感', '米・麹', '吟醸香', 'ホップ'], only: ['brew'] },
   { g: '質感・印象', t: ['甘口', 'ドライ', 'オイリー', '滑らか', '力強い', '軽やか', '長い余韻', '樽感強め'] },
 ];
 const PRESET_TAGS = new Set(TAG_GROUPS.flatMap(x => x.t));
@@ -365,7 +372,7 @@ function renderList() {
   <div class="tools">
     <input type="search" id="q" placeholder="銘柄・産地・香り・場所などで検索" value="${esc(F.q)}" enterkeyhint="search" autocomplete="off">
     <div class="chips" id="catChips">
-      ${[['all', 'すべて'], ...Object.entries(CATS)].map(([k, v]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${F.cat === k}">${v}</button>`).join('')}
+      ${[['all', 'すべて'], ...Object.entries(CATS).filter(([k]) => k === F.cat || notes.some(n => n.category === k))].map(([k, v]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${F.cat === k}">${v}</button>`).join('')}
     </div>
     <div class="row">
       <select id="sort" aria-label="並べ替え">
@@ -507,7 +514,7 @@ function tagUniverse() {
   return uniq([...customTags, ...notes.flatMap(n => n.tags), ...(E ? E.tags : [])]).filter(t => !PRESET_TAGS.has(t));
 }
 function tagPickerHTML() {
-  const groups = TAG_GROUPS.filter(g => !(g.not || []).includes(E.category));
+  const groups = TAG_GROUPS.filter(g => !g.only || g.only.includes(E.category));
   const custom = tagUniverse();
   const chip = t => `<button type="button" class="chip tag" data-act="ed-tag" data-v="${esc(t)}" aria-pressed="${E.tags.includes(t)}">${esc(t)}</button>`;
   return groups.map(g => `<div class="tag-group"><h3>${esc(g.g)}</h3><div class="chips">${g.t.map(chip).join('')}</div></div>`).join('')
