@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>テイスティングノート</title>
+<meta name="description" content="ウイスキー・ジンのテイスティングノート">
+<meta name="theme-color" content="#f6f1ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16120f" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="テイスティング">
+<style>
+:root{
+  --bg:#f6f1ea; --surface:#fffdf9; --surface2:#efe7dc; --ink:#2a211b; --ink2:#6b5d51; --line:#ddd1c2;
+  --accent:#9a5b1c; --accent-ink:#fff; --accent-soft:#f0dfc8; --danger:#b3372b;
+  --whisky:#9a5b1c; --gin:#3f7d6e; --other:#6d6b8a;
+  --shadow:0 1px 2px rgba(60,40,20,.08),0 4px 14px rgba(60,40,20,.06);
+  --radius:14px;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",system-ui,sans-serif;
+  --font-serif:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
+    --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
+    --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
+  --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
+  --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#app{max-width:820px;margin:0 auto;padding:0 16px 96px}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-weight:600;line-height:1.35}
+svg.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.12em}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+.top h1{font-family:var(--font-serif);font-size:22px;display:flex;align-items:center;gap:8px;letter-spacing:.02em;white-space:nowrap;min-width:0}
+.top h1 svg{color:var(--accent);font-size:26px;flex:none}
+.top-actions{display:flex;gap:8px;align-items:center;flex:none}
+@media (max-width:430px){.top h1{font-size:18px;gap:6px}.top h1 svg{font-size:22px}.top-actions .btn.small{padding:0 12px}.top-actions .btn{padding:0 14px}}
+.back{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px 0 0;background:none;border:0;color:var(--accent);cursor:pointer;font-weight:600}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,var(--line))}
+.btn.small{min-height:36px;padding:0 14px;font-size:14px}
+.btn.block{width:100%}
+
+/* list tools */
+.tools{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+input[type=search],input[type=text],input[type=date],input[type=number],select,textarea{
+  width:100%;min-height:46px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:16px;-webkit-appearance:none;appearance:none}
+textarea{resize:vertical;min-height:84px;line-height:1.6;field-sizing:content}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip.tag[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center}
+.row>select{flex:1}
+#tagPanel{padding:12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.count{color:var(--ink2);font-size:14px;margin:6px 2px}
+
+/* notice */
+.notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:var(--accent-soft);font-size:14px;margin:6px 0}
+.notice button{flex:none}
+
+/* cards */
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+.card{display:flex;gap:12px;padding:12px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);min-height:96px}
+.card:active{background:var(--surface2)}
+.card .thumb{flex:none;width:84px;height:84px;border-radius:10px;object-fit:cover;background:var(--surface2)}
+.card .ph{flex:none;width:84px;height:84px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:34px;opacity:.7}
+.card-body{min-width:0;flex:1}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2)}
+.card h3{font-size:17px;margin:2px 0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.sub{margin:0;color:var(--ink2);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snip{margin:4px 0 0;font-size:13.5px;color:var(--ink2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.badge{display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;line-height:20px;color:#fff}
+.badge.whisky{background:var(--whisky)} .badge.gin{background:var(--gin)} .badge.other{background:var(--other)}
+:root[data-theme="dark"] .badge{color:#1c1611}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge{color:#1c1611}}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tagpill{padding:0 8px;border-radius:999px;background:var(--accent-soft);font-size:12px;line-height:20px;white-space:nowrap}
+.empty{text-align:center;padding:56px 16px;color:var(--ink2)}
+.empty svg{font-size:56px;color:var(--accent);opacity:.6}
+.empty p{margin:10px 0 18px}
+
+/* detail */
+.detail-photo{width:100%;max-height:52vh;object-fit:contain;background:var(--surface2);border-radius:var(--radius);margin:4px 0 14px}
+.d-title{font-family:var(--font-serif);font-size:26px;margin:6px 0 4px}
+.d-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--ink2);font-size:14.5px;margin:0 0 6px}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:12px 0}
+.section h2{font-size:14px;color:var(--ink2);margin-bottom:8px;letter-spacing:.04em}
+.kv{display:grid;grid-template-columns:5.5em 1fr;gap:6px 12px;margin:0}
+.kv dt{color:var(--ink2);font-size:14px}
+.kv dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.kv dd.empty-v{color:var(--ink2);opacity:.6}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.same a{display:block;padding:8px 0;border-top:1px solid var(--line)}
+.same a:first-of-type{border-top:0}
+.same time{font-size:13px;color:var(--ink2);margin-right:8px}
+
+/* editor */
+.field{margin:0 0 14px}
+.field label,.field .lbl{display:block;font-size:14px;color:var(--ink2);margin:0 0 5px}
+.field .hint{font-size:12.5px;color:var(--ink2);margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:480px){.three{grid-template-columns:1fr 1fr}}
+.tag-group{margin:0 0 12px}
+.tag-group h3{font-size:13px;color:var(--ink2);margin:0 0 6px}
+.add-tag{display:flex;gap:8px;margin-top:8px}
+.photo-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.photo-box img{width:120px;height:120px;object-fit:cover;border-radius:12px;background:var(--surface2)}
+.savebar{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:5}
+.savebar .btn{flex:1}
+.hidden-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* backup */
+.stat{display:flex;gap:20px;flex-wrap:wrap;color:var(--ink2);font-size:14px}
+.stat b{color:var(--ink);font-size:20px;margin-right:3px}
+.btn-col{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.section p{margin:6px 0;font-size:14.5px}
+.section p.muted,.muted{color:var(--ink2);font-size:13.5px}
+.section ul{margin:6px 0;padding-left:1.3em;font-size:14.5px}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.dialog{background:var(--surface);border-radius:18px;padding:20px;max-width:420px;width:100%;box-shadow:var(--shadow)}
+.dialog p{margin:0 0 16px;white-space:pre-wrap}
+.dialog .row{justify-content:flex-end}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14.5px;z-index:60;max-width:90vw;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<noscript><p style="padding:24px">このアプリの利用にはJavaScriptを有効にしてください。</p></noscript>
+
+<script>
+'use strict';
+/* ============================================================
+   テイスティングノート  (ローカル保存 / 同期なし / PWA)
+   データはこの端末のブラウザ内 IndexedDB に保存されます。
+   ============================================================ */
+
+/* ---------- 定数 ---------- */
+const CATS = { whisky: 'ウイスキー', gin: 'ジン', other: 'その他' };
+const PLACES = ['自店', '他店', '自宅', 'イベント', 'その他'];
+const SERVES = ['ストレート', 'ロック', 'トワイスアップ', '水割り', 'ソーダ割り', 'ジントニック', 'カクテル', 'その他'];
+const TYPE_SUGGEST = {
+  whisky: ['シングルモルト', 'ブレンデッド', 'ブレンデッドモルト', 'グレーン', 'バーボン', 'ライ', 'テネシー', 'ジャパニーズ', 'アイリッシュ', 'カナディアン'],
+  gin: ['ロンドンドライ', 'プリマス', 'オールドトム', 'ニューウェスタン', 'ジェネヴァ', 'クラフト', 'ジャパニーズクラフト', 'シップスミス', 'スロージン'],
+  other: ['ラム', 'テキーラ', 'ブランデー', 'ウォッカ', 'リキュール', 'ジャパニーズ焼酎'],
+};
+const TAG_GROUPS = [
+  { g: 'フルーツ', t: ['シトラス', '青りんご・洋梨', 'トロピカル', '赤い果実', 'ドライフルーツ', 'レーズン'] },
+  { g: '花・ハーブ', t: ['フローラル', 'ハーバル', 'ミント', '紅茶・茶葉', '牧草'] },
+  { g: '甘み・菓子', t: ['バニラ', 'キャラメル', '蜂蜜', 'チョコレート', 'ナッツ', '麦芽(モルト)', 'クリーミー'] },
+  { g: 'スパイス・木', t: ['スパイシー', 'ペッパー', 'シナモン', 'ジンジャー', 'ウッディ・オーク', 'シェリー樽'] },
+  { g: '燻製・海', t: ['スモーキー', 'ピーティ', 'ヨード・潮', 'タール・焦げ', 'ミネラル'] },
+  { g: 'ボタニカル', t: ['ジュニパー', 'コリアンダー', 'アンジェリカ', 'カルダモン', '柚子', '山椒', 'ローズ', 'ラベンダー', 'リコリス'], not: ['whisky'] },
+  { g: '質感・印象', t: ['甘口', 'ドライ', 'オイリー', '滑らか', '力強い', '軽やか', '長い余韻', '樽感強め'] },
+];
+const PRESET_TAGS = new Set(TAG_GROUPS.flatMap(x => x.t));
+const FIELDS = ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price', 'date', 'place', 'placeName', 'serve', 'color', 'nose', 'palate', 'finish', 'overall'];
+const ICON_GLASS = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8c.6 3 1 5 .2 8-.5 2-1.8 3.2-3.2 3.7V19h3v2H8v-2h3v-4.3C9.6 14.2 8.3 13 7.8 11 7 8 7.4 6 8 3z"/></svg>';
+const ICON_BACK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+
+/* ---------- ユーティリティ ---------- */
+const app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const fmtDate = s => s ? s.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, '$1/$2/$3') : '';
+const norm = s => String(s || '').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const isNum = s => /^\d+(\.\d+)?$/.test(String(s).trim());
+const uniq = a => [...new Set(a)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function toast(msg, ms = 2400) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg; t.setAttribute('role', 'status');
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+
+function confirmDialog(message, okLabel = 'OK', danger = false) {
+  return new Promise(resolve => {
+    const o = document.createElement('div');
+    o.className = 'overlay';
+    o.innerHTML = `<div class="dialog" role="dialog" aria-modal="true"><p>${esc(message)}</p>
+      <div class="row"><button class="btn" data-r="0">キャンセル</button>
+      <button class="btn ${danger ? 'danger' : 'primary'}" data-r="1">${esc(okLabel)}</button></div></div>`;
+    o.addEventListener('click', e => {
+      const b = e.target.closest('[data-r]');
+      if (b || e.target === o) { o.remove(); resolve(b?.dataset.r === '1'); }
+    });
+    document.body.appendChild(o);
+    o.querySelector('[data-r="1"]').focus();
+  });
+}
+
+/* ---------- IndexedDB ---------- */
+let db;
+function openDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('tasting-notes', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('notes', { keyPath: 'id' }); r.result.createObjectStore('meta'); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+function tx(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const t = db.transaction(store, mode);
+    let out;
+    const rq = fn(t.objectStore(store));
+    if (rq) rq.onsuccess = () => { out = rq.result; };
+    t.oncomplete = () => res(out);
+    t.onerror = () => rej(t.error);
+    t.onabort = () => rej(t.error || new Error('transaction aborted'));
+  });
+}
+const dbAll = () => tx('notes', 'readonly', s => s.getAll());
+const dbPut = n => tx('notes', 'readwrite', s => s.put(n));
+const dbDel = id => tx('notes', 'readwrite', s => s.delete(id));
+const dbPutMany = arr => tx('notes', 'readwrite', s => { arr.forEach(n => s.put(n)); });
+const dbClear = () => tx('notes', 'readwrite', s => s.clear());
+const metaGet = k => tx('meta', 'readonly', s => s.get(k));
+const metaSet = (k, v) => tx('meta', 'readwrite', s => s.put(v, k));
+const metaDel = k => tx('meta', 'readwrite', s => s.delete(k));
+
+/* ---------- 状態 ---------- */
+let notes = [];
+let customTags = [];       // ユーザーが追加したタグ
+let lastBackup = 0;
+let deferredInstall = null;
+const F = { q: '', cat: 'all', tags: [], sort: 'date-desc', tagPanel: false };
+let listScroll = 0;
+let E = null, E0 = '', editKey = '', draftTimer = null, draftRestored = false;
+
+function normalizeNote(n) { n.tags = Array.isArray(n.tags) ? n.tags : []; return n; }
+function sortedNotes() {
+  const a = [...notes];
+  const byDate = (x, y) => (y.date || '').localeCompare(x.date || '') || y.createdAt - x.createdAt;
+  switch (F.sort) {
+    case 'date-asc': a.sort((x, y) => -byDate(x, y)); break;
+    case 'name': a.sort((x, y) => x.name.localeCompare(y.name, 'ja')); break;
+    case 'updated': a.sort((x, y) => y.updatedAt - x.updatedAt); break;
+    default: a.sort(byDate);
+  }
+  return a;
+}
+function filteredNotes() {
+  const words = norm(F.q).split(/\s+/).filter(Boolean);
+  return sortedNotes().filter(n => {
+    if (F.cat !== 'all' && n.category !== F.cat) return false;
+    if (F.tags.length && !F.tags.every(t => n.tags.includes(t))) return false;
+    if (words.length) {
+      const hay = norm([n.name, n.brand, n.type, n.region, n.placeName, n.place, n.serve, n.color, n.nose, n.palate, n.finish, n.overall, n.tags.join(' ')].join(' '));
+      return words.every(w => hay.includes(w));
+    }
+    return true;
+  });
+}
+function usedTags() {
+  const c = {};
+  notes.forEach(n => n.tags.forEach(t => { c[t] = (c[t] || 0) + 1; }));
+  return Object.entries(c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'));
+}
+function metaLine(n) {
+  const p = [];
+  if (n.brand) p.push(n.brand);
+  if (n.type) p.push(n.type);
+  if (n.region) p.push(n.region);
+  if (n.abv) p.push(isNum(n.abv) ? n.abv + '%' : n.abv);
+  if (n.age) p.push(isNum(n.age) ? n.age + '年' : n.age);
+  return p.join(' ・ ');
+}
+function snippet(n) { return (n.overall || n.palate || n.nose || '').replace(/\s+/g, ' '); }
+
+/* ---------- ルーティング ---------- */
+function go(hash, replace) {
+  if (replace) { history.replaceState(null, '', hash); route(); }
+  else if (location.hash === hash) route();
+  else location.hash = hash;
+}
+window.addEventListener('hashchange', route);
+
+async function route() {
+  const parts = (location.hash.slice(1) || '/').split('/').filter(Boolean);
+  const [a, b] = parts;
+  if (a === 'n' && b) return renderDetail(b);
+  if (a === 'new') return openEditor(null, b || null);
+  if (a === 'edit' && b) return openEditor(b, null);
+  if (a === 'backup') return renderBackup();
+  return renderList();
+}
+
+/* ============================================================
+   一覧
+   ============================================================ */
+function renderList() {
+  document.title = 'テイスティングノート';
+  const showNotice = notes.length > 0 && (!lastBackup || Date.now() - lastBackup > 30 * 86400e3);
+  app.innerHTML = `
+  <header class="top">
+    <h1>${ICON_GLASS}テイスティングノート</h1>
+    <div class="top-actions">
+      <button class="btn ghost small" data-act="backup">バックアップ</button>
+      <button class="btn primary" data-act="new">＋ 新規</button>
+    </div>
+  </header>
+  ${showNotice ? `<div class="notice"><span>${lastBackup ? '前回のバックアップから30日以上たっています。' : 'まだバックアップがありません。'}端末が故障するとデータが消えるため、定期的な書き出しをおすすめします。</span><button class="btn small" data-act="backup">開く</button></div>` : ''}
+  <div class="tools">
+    <input type="search" id="q" placeholder="銘柄・産地・香り・場所などで検索" value="${esc(F.q)}" enterkeyhint="search" autocomplete="off">
+    <div class="chips" id="catChips">
+      ${[['all', 'すべて'], ...Object.entries(CATS)].map(([k, v]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${F.cat === k}">${v}</button>`).join('')}
+    </div>
+    <div class="row">
+      <select id="sort" aria-label="並べ替え">
+        ${[['date-desc', '飲んだ日：新しい順'], ['date-asc', '飲んだ日：古い順'], ['name', '銘柄名順'], ['updated', '更新日順']].map(([k, v]) => `<option value="${k}" ${F.sort === k ? 'selected' : ''}>${v}</option>`).join('')}
+      </select>
+      <button class="btn small" data-act="tagpanel" id="tagBtn"></button>
+    </div>
+    <div id="tagPanel" hidden></div>
+  </div>
+  <div id="results"></div>`;
+  updateList();
+  window.scrollTo(0, listScroll);
+}
+
+function updateList() {
+  const list = filteredNotes();
+  const tagBtn = $('#tagBtn');
+  if (tagBtn) tagBtn.textContent = 'タグ絞り込み' + (F.tags.length ? ` (${F.tags.length})` : '');
+  const panel = $('#tagPanel');
+  if (panel) {
+    panel.hidden = !F.tagPanel;
+    if (F.tagPanel) {
+      const used = usedTags();
+      panel.innerHTML = used.length
+        ? `<div class="chips">${used.map(([t, c]) => `<button class="chip tag" data-act="ftag" data-v="${esc(t)}" aria-pressed="${F.tags.includes(t)}">${esc(t)} <small>${c}</small></button>`).join('')}</div>
+           ${F.tags.length ? '<div style="margin-top:10px"><button class="btn small" data-act="cleartags">タグ選択をクリア</button></div>' : ''}`
+        : '<span class="muted">まだタグがありません</span>';
+    }
+  }
+  const r = $('#results');
+  if (!r) return;
+  if (!notes.length) {
+    r.innerHTML = `<div class="empty">${ICON_GLASS}<p>まだノートがありません。<br>最初の1杯を記録してみましょう。</p><button class="btn primary" data-act="new">＋ 新規ノート</button></div>`;
+    return;
+  }
+  if (!list.length) {
+    r.innerHTML = `<div class="empty"><p>条件に合うノートがありません。</p><button class="btn" data-act="clearfilters">絞り込みを解除</button></div>`;
+    return;
+  }
+  const filtering = F.q || F.cat !== 'all' || F.tags.length;
+  r.innerHTML = `<div class="count">${filtering ? `${list.length}件 / 全${notes.length}件` : `${notes.length}件`}</div>
+  <div class="grid">${list.map(cardHTML).join('')}</div>`;
+}
+
+function cardHTML(n) {
+  const tags = n.tags.slice(0, 4).map(t => `<span class="tagpill">${esc(t)}</span>`).join('') + (n.tags.length > 4 ? `<span class="tagpill">+${n.tags.length - 4}</span>` : '');
+  return `<a class="card" href="#/n/${esc(n.id)}" data-act="open-note">
+    ${n.thumb ? `<img class="thumb" src="${esc(n.thumb)}" alt="" loading="lazy">` : `<div class="ph">${ICON_GLASS}</div>`}
+    <div class="card-body">
+      <div class="card-top"><span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span><time>${esc(fmtDate(n.date))}</time></div>
+      <h3>${esc(n.name)}</h3>
+      <p class="sub">${esc(metaLine(n)) || '&nbsp;'}</p>
+      ${tags ? `<div class="tags">${tags}</div>` : ''}
+      ${snippet(n) ? `<p class="snip">${esc(snippet(n))}</p>` : ''}
+    </div></a>`;
+}
+
+/* ============================================================
+   詳細
+   ============================================================ */
+function renderDetail(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
+  document.title = n.name + ' - テイスティングノート';
+  const kv = (k, v) => `<dt>${k}</dt><dd class="${v ? '' : 'empty-v'}">${v ? esc(v) : '―'}</dd>`;
+  const same = notes.filter(o => o.id !== n.id && norm(o.name) === norm(n.name)).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const situation = [n.place, n.placeName].filter(Boolean).join(' / ');
+  app.innerHTML = `
+  <header class="top">
+    <button class="back" data-act="back-list">${ICON_BACK}一覧</button>
+    <div class="top-actions"><button class="btn small" data-act="edit" data-id="${esc(n.id)}">編集</button></div>
+  </header>
+  ${n.photo ? `<img class="detail-photo" src="${esc(n.photo)}" alt="">` : ''}
+  <span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span>
+  <h2 class="d-title">${esc(n.name)}</h2>
+  <p class="d-meta">${[n.brand, n.type, n.region].filter(Boolean).map(esc).join(' ・ ')}</p>
+  ${n.tags.length ? `<div class="tags" style="margin:6px 0 4px">${n.tags.map(t => `<span class="tagpill">${esc(t)}</span>`).join('')}</div>` : ''}
+
+  <div class="section"><h2>基本情報</h2><dl class="kv">
+    ${kv('度数', n.abv ? (isNum(n.abv) ? n.abv + '%' : n.abv) : '')}
+    ${kv('熟成年数', n.age ? (isNum(n.age) ? n.age + '年' : n.age) : '')}
+    ${kv('価格', n.price ? '¥' + (isNum(n.price) ? Number(n.price).toLocaleString('ja-JP') : n.price) : '')}
+  </dl></div>
+
+  <div class="section"><h2>テイスティング</h2><dl class="kv">
+    ${kv('色', n.color)}${kv('香り', n.nose)}${kv('味わい', n.palate)}${kv('余韻', n.finish)}${kv('総合', n.overall)}
+  </dl></div>
+
+  <div class="section"><h2>飲んだ状況</h2><dl class="kv">
+    ${kv('日付', fmtDate(n.date))}${kv('場所', situation)}${kv('飲み方', n.serve)}
+  </dl></div>
+
+  ${same.length ? `<div class="section same"><h2>同じ銘柄の他のノート</h2>${same.map(o => `<a href="#/n/${esc(o.id)}"><time>${esc(fmtDate(o.date))}</time>${esc(snippet(o).slice(0, 60) || o.serve || '(記載なし)')}</a>`).join('')}</div>` : ''}
+
+  <div class="actions">
+    <button class="btn" data-act="dup" data-id="${esc(n.id)}">同じ銘柄で新しいノートを書く</button>
+    <button class="btn danger" data-act="del" data-id="${esc(n.id)}">削除</button>
+  </div>`;
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   編集
+   ============================================================ */
+function blankNote() {
+  return { id: uid(), createdAt: Date.now(), updatedAt: Date.now(), category: 'whisky', name: '', brand: '', type: '', region: '', abv: '', age: '', price: '', date: today(), place: '', placeName: '', serve: '', color: '', nose: '', palate: '', finish: '', overall: '', tags: [], photo: '', thumb: '' };
+}
+
+async function openEditor(id, fromId) {
+  editKey = 'draft:' + (id || 'new');
+  let base;
+  if (id) {
+    const n = notes.find(x => x.id === id);
+    if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
+    base = structuredClone(n);
+  } else {
+    base = blankNote();
+    const src = fromId && notes.find(x => x.id === fromId);
+    if (src) for (const k of ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price']) base[k] = src[k];
+  }
+  E0 = JSON.stringify(base);
+  E = base;
+  draftRestored = false;
+  if (!fromId) {
+    try {
+      const d = await metaGet(editKey);
+      if (d && d.data) { E = normalizeNote(d.data); draftRestored = true; }
+    } catch (_) { /* 下書きは無くても動く */ }
+  }
+  renderEditor(!!id);
+}
+
+function tagUniverse() {
+  return uniq([...customTags, ...notes.flatMap(n => n.tags), ...(E ? E.tags : [])]).filter(t => !PRESET_TAGS.has(t));
+}
+function tagPickerHTML() {
+  const groups = TAG_GROUPS.filter(g => !(g.not || []).includes(E.category));
+  const custom = tagUniverse();
+  const chip = t => `<button type="button" class="chip tag" data-act="ed-tag" data-v="${esc(t)}" aria-pressed="${E.tags.includes(t)}">${esc(t)}</button>`;
+  return groups.map(g => `<div class="tag-group"><h3>${esc(g.g)}</h3><div class="chips">${g.t.map(chip).join('')}</div></div>`).join('')
+    + (custom.length ? `<div class="tag-group"><h3>自分で追加したタグ</h3><div class="chips">${custom.map(chip).join('')}</div></div>` : '')
+    + `<div class="add-tag"><input type="text" id="newTag" placeholder="タグを追加（例：桜餅、白檀）" maxlength="20" enterkeyhint="done"><button type="button" class="btn" data-act="ed-addtag">追加</button></div>`;
+}
+function optList(vals) { return uniq(vals.filter(Boolean)).map(v => `<option value="${esc(v)}">`).join(''); }
+function typeOptionsHTML() { return optList([...(TYPE_SUGGEST[E.category] || []), ...notes.filter(n => n.category === E.category).map(n => n.type)]); }
+function chipRow(field, values) {
+  return `<div class="chips">${values.map(v => `<button type="button" class="chip" data-act="ed-chip" data-f="${field}" data-v="${esc(v)}" aria-pressed="${E[field] === v}">${esc(v)}</button>`).join('')}</div>`;
+}
+
+function renderEditor(isEdit) {
+  document.title = (isEdit ? 'ノートを編集' : '新しいノート') + ' - テイスティングノート';
+  const inp = (name, label, extra = '') => `<div class="field"><label for="f-${name}">${label}</label><input type="text" id="f-${name}" name="${name}" value="${esc(E[name])}" ${extra}></div>`;
+  const ta = (name, label, ph) => `<div class="field"><label for="f-${name}">${label}</label><textarea id="f-${name}" name="${name}" rows="3" placeholder="${esc(ph)}">${esc(E[name])}</textarea></div>`;
+  app.innerHTML = `
+  <div id="editor">
+  <header class="top">
+    <button class="back" data-act="ed-cancel">${ICON_BACK}${isEdit ? '編集をやめる' : 'キャンセル'}</button>
+    <h1 style="font-size:17px">${isEdit ? 'ノートを編集' : '新しいノート'}</h1>
+  </header>
+  ${draftRestored ? `<div class="notice"><span>前回の未保存の下書きを復元しました。</span><button class="btn small" data-act="ed-discard">下書きを破棄</button></div>` : ''}
+
+  <div class="section"><h2>基本情報</h2>
+    <div class="field"><span class="lbl">種類</span>
+      <div class="chips">${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-act="ed-chip" data-f="category" data-v="${k}" data-req="1" aria-pressed="${E.category === k}">${v}</button>`).join('')}</div></div>
+    ${inp('name', '銘柄名 <span style="color:var(--danger)">*</span>', 'autocomplete="off" placeholder="例：山崎 12年 / ボンベイ・サファイア"')}
+    <div class="two">
+      ${inp('brand', '蒸留所・ブランド', 'list="dl-brand" autocomplete="off"')}
+      ${inp('region', '産地', 'list="dl-region" autocomplete="off" placeholder="例：スペイサイド"')}
+    </div>
+    ${inp('type', 'タイプ', 'list="dl-type" autocomplete="off" placeholder="例：シングルモルト / ロンドンドライ"')}
+    <div class="three">
+      <div class="field"><label for="f-abv">度数(%)</label><input type="text" id="f-abv" name="abv" value="${esc(E.abv)}" inputmode="decimal" placeholder="43"></div>
+      <div class="field"><label for="f-age">熟成年数</label><input type="text" id="f-age" name="age" value="${esc(E.age)}" placeholder="12 / NAS"></div>
+      <div class="field"><label for="f-price">価格(円)</label><input type="text" id="f-price" name="price" value="${esc(E.price)}" inputmode="numeric" placeholder="ボトル価格"></div>
+    </div>
+    <datalist id="dl-brand">${optList(notes.map(n => n.brand))}</datalist>
+    <datalist id="dl-region">${optList(notes.map(n => n.region))}</datalist>
+    <datalist id="dl-type">${typeOptionsHTML()}</datalist>
+  </div>
+
+  <div class="section"><h2>テイスティング</h2>
+    ${ta('color', '色', '例：深みのある琥珀色、無色透明')}
+    ${ta('nose', '香り(ノーズ)', '')}
+    ${ta('palate', '味わい(パレット)', '')}
+    ${ta('finish', '余韻(フィニッシュ)', '')}
+    ${ta('overall', '総合コメント', '')}
+  </div>
+
+  <div class="section"><h2>フレーバータグ</h2>
+    <div id="tagPicker">${tagPickerHTML()}</div>
+  </div>
+
+  <div class="section"><h2>飲んだ状況</h2>
+    <div class="field"><label for="f-date">日付</label><input type="date" id="f-date" name="date" value="${esc(E.date)}"></div>
+    <div class="field"><span class="lbl">場所</span>${chipRow('place', PLACES)}</div>
+    ${inp('placeName', '店名・場所のメモ', 'list="dl-place" autocomplete="off"')}
+    <datalist id="dl-place">${optList(notes.map(n => n.placeName))}</datalist>
+    <div class="field"><span class="lbl">飲み方</span>${chipRow('serve', SERVES)}</div>
+  </div>
+
+  <div class="section"><h2>写真</h2>
+    <div class="photo-box" id="photoBox">${photoBoxHTML()}</div>
+    <input class="hidden-file" type="file" id="photoInput" accept="image/*">
+  </div>
+
+  <div class="savebar">
+    <button class="btn" data-act="ed-cancel">キャンセル</button>
+    <button class="btn primary" data-act="ed-save">保存</button>
+  </div>
+  </div>`;
+  window.scrollTo(0, 0);
+}
+function photoBoxHTML() {
+  return (E.thumb ? `<img src="${esc(E.thumb)}" alt="添付写真">` : '')
+    + `<div class="row"><button type="button" class="btn small" data-act="ed-photo">${E.thumb ? '写真を変更' : '写真を追加'}</button>`
+    + (E.thumb ? `<button type="button" class="btn small danger" data-act="ed-photo-rm">削除</button>` : '') + `</div>`;
+}
+
+function scheduleDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    if (E && JSON.stringify(E) !== E0) metaSet(editKey, { data: E, at: Date.now() }).catch(() => {});
+  }, 500);
+}
+async function clearDraft() {
+  clearTimeout(draftTimer);
+  try { await metaDel(editKey); } catch (_) {}
+}
+
+function processPhoto(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const mk = (max, q) => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * s)); c.height = Math.max(1, Math.round(img.height * s));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        return c.toDataURL('image/jpeg', q);
+      };
+      const out = { photo: mk(1280, 0.82), thumb: mk(320, 0.75) };
+      URL.revokeObjectURL(url); res(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('画像を読み込めませんでした')); };
+    img.src = url;
+  });
+}
+
+async function saveNote() {
+  if (!E.name.trim()) { toast('銘柄名を入力してください'); $('#f-name')?.focus(); return; }
+  E.name = E.name.trim();
+  E.updatedAt = Date.now();
+  try {
+    await dbPut(E);
+  } catch (err) {
+    toast('保存に失敗しました。ストレージの空き容量を確認してください', 4000); console.error(err); return;
+  }
+  const i = notes.findIndex(n => n.id === E.id);
+  if (i >= 0) notes[i] = E; else notes.push(E);
+  await clearDraft();
+  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+  const id = E.id; E = null;
+  toast('保存しました');
+  go('#/n/' + id, true);
+}
+
+/* ============================================================
+   バックアップ
+   ============================================================ */
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+async function renderBackup() {
+  document.title = 'バックアップ - テイスティングノート';
+  let usage = '', persisted = null;
+  try { const e = await navigator.storage?.estimate?.(); if (e?.usage != null) usage = (e.usage / 1048576).toFixed(1) + ' MB'; } catch (_) {}
+  try { persisted = await navigator.storage?.persisted?.(); } catch (_) {}
+  app.innerHTML = `
+  <header class="top">
+    <button class="back" data-act="back-list">${ICON_BACK}一覧</button>
+    <h1 style="font-size:17px">バックアップ</h1>
+  </header>
+  <div class="section"><h2>この端末のデータ</h2>
+    <div class="stat"><span><b>${notes.length}</b>件</span>${usage ? `<span><b>${esc(usage)}</b>使用</span>` : ''}</div>
+    <p class="muted">最終バックアップ：${lastBackup ? new Date(lastBackup).toLocaleString('ja-JP') : 'なし'}</p>
+    ${persisted === false ? '<p class="muted">ブラウザの自動削除保護は未設定です。ノートを保存すると要求されます。</p>' : ''}
+  </div>
+
+  <div class="section"><h2>書き出し</h2>
+    <p>データはこの端末のブラウザ内だけに保存され、同期されません。定期的にファイルへ書き出して保管してください。</p>
+    <div class="btn-col">
+      <button class="btn primary" data-act="exp-json">JSONで書き出す（バックアップ用・写真も含む）</button>
+      <button class="btn" data-act="exp-csv">CSVで書き出す（Excel等で閲覧用・写真なし）</button>
+    </div>
+  </div>
+
+  <div class="section"><h2>読み込み</h2>
+    <p>JSONバックアップから復元します。別の端末への引っ越しにも使えます。</p>
+    <div class="btn-col">
+      <button class="btn" data-act="imp" data-mode="merge">追加・統合して読み込む</button>
+      <button class="btn danger" data-act="imp" data-mode="replace">すべて置き換えて読み込む</button>
+    </div>
+    <input class="hidden-file" type="file" id="importInput" accept=".json,application/json">
+    <p class="muted">「統合」は同じノートがあれば新しい方を残し、無いものを追加します。</p>
+  </div>
+
+  ${isStandalone() ? '' : `<div class="section"><h2>アプリとして使う</h2>
+    ${deferredInstall ? '<div class="btn-col" style="margin-bottom:10px"><button class="btn" data-act="install">このPCにインストール</button></div>' : ''}
+    <ul>
+      <li>iPad：Safariで開き、共有ボタン →「ホーム画面に追加」</li>
+      <li>Windows：Edge/Chromeのアドレスバー右のインストールアイコン</li>
+    </ul>
+    <p class="muted">iPadではSafariのタブとホーム画面のアプリでデータが別々に保存されます。ホーム画面に追加してから記録を始めるのがおすすめです。</p></div>`}`;
+  window.scrollTo(0, 0);
+}
+
+async function deliverFile(blob, filename) {
+  const file = new File([blob], filename, { type: blob.type });
+  if (isIOS() && navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: filename }); return true; }
+    catch (e) { if (e.name === 'AbortError') return false; }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  return true;
+}
+const stamp = () => today().replace(/-/g, '');
+
+async function exportJSON() {
+  const data = { app: 'tasting-notes', version: 1, exportedAt: new Date().toISOString(), customTags, notes };
+  const ok = await deliverFile(new Blob([JSON.stringify(data)], { type: 'application/json' }), `tasting-notes_${stamp()}.json`);
+  if (ok) { lastBackup = Date.now(); await metaSet('lastBackup', lastBackup).catch(() => {}); toast('書き出しました'); if ((location.hash || '').startsWith('#/backup')) renderBackup(); }
+}
+function exportCSV() {
+  const head = ['日付', '種類', '銘柄名', '蒸留所・ブランド', 'タイプ', '産地', '度数', '熟成年数', '価格', '場所', '店名・場所メモ', '飲み方', '色', '香り', '味わい', '余韻', '総合', 'タグ'];
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = sortedNotes().map(n => [n.date, CATS[n.category], n.name, n.brand, n.type, n.region, n.abv, n.age, n.price, n.place, n.placeName, n.serve, n.color, n.nose, n.palate, n.finish, n.overall, n.tags.join('・')]);
+  const csv = '﻿' + [head, ...rows].map(r => r.map(q).join(',')).join('\r\n');
+  deliverFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `tasting-notes_${stamp()}.csv`).then(ok => ok && toast('書き出しました'));
+}
+
+function cleanImported(o) {
+  if (!o || typeof o !== 'object' || !o.id || !o.name) return null;
+  const n = { id: String(o.id) };
+  for (const k of FIELDS) n[k] = String(o[k] ?? '');
+  if (!CATS[n.category]) n.category = 'other';
+  n.tags = Array.isArray(o.tags) ? o.tags.map(String).filter(Boolean) : [];
+  const img = v => (typeof v === 'string' && v.startsWith('data:image/') ? v : '');
+  n.photo = img(o.photo); n.thumb = img(o.thumb);
+  n.createdAt = Number(o.createdAt) || Date.now();
+  n.updatedAt = Number(o.updatedAt) || n.createdAt;
+  return n;
+}
+async function importFile(file, mode) {
+  let data;
+  try { data = JSON.parse(await file.text()); } catch { return toast('JSONとして読み込めませんでした', 3500); }
+  if (!data || !Array.isArray(data.notes)) return toast('このアプリのバックアップファイルではありません', 3500);
+  const incoming = data.notes.map(cleanImported).filter(Boolean);
+  if (!incoming.length) return toast('読み込めるノートがありませんでした', 3500);
+  if (mode === 'replace') {
+    if (!await confirmDialog(`いまの${notes.length}件をすべて削除し、バックアップの${incoming.length}件に置き換えます。よろしいですか？`, '置き換える', true)) return;
+    await dbClear(); await dbPutMany(incoming);
+    notes = incoming;
+    customTags = uniq((data.customTags || []).map(String));
+    await metaSet('customTags', customTags).catch(() => {});
+    toast(`${incoming.length}件に置き換えました`);
+  } else {
+    const byId = new Map(notes.map(n => [n.id, n]));
+    let added = 0, updated = 0; const write = [];
+    for (const n of incoming) {
+      const cur = byId.get(n.id);
+      if (!cur) { added++; write.push(n); byId.set(n.id, n); }
+      else if (n.updatedAt > cur.updatedAt) { updated++; write.push(n); byId.set(n.id, n); }
+    }
+    if (write.length) await dbPutMany(write);
+    notes = [...byId.values()];
+    customTags = uniq([...customTags, ...(data.customTags || []).map(String)]);
+    await metaSet('customTags', customTags).catch(() => {});
+    toast(`追加${added}件・更新${updated}件`);
+  }
+  renderBackup();
+}
+
+/* ============================================================
+   イベント
+   ============================================================ */
+function $(s, r = document) { return r.querySelector(s); }
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const act = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
+  switch (act) {
+    case 'open-note': listScroll = window.scrollY; return;         // リンクの通常遷移に任せる
+    case 'new': return go('#/new');
+    case 'backup': listScroll = window.scrollY; return go('#/backup');
+    case 'back-list': return go('#/');
+    case 'edit': return go('#/edit/' + id);
+    case 'dup': return go('#/new/' + id);
+    case 'del': {
+      const n = notes.find(x => x.id === id);
+      if (n && await confirmDialog(`「${n.name}」のノートを削除します。元に戻せません。`, '削除する', true)) {
+        await dbDel(id); notes = notes.filter(x => x.id !== id); toast('削除しました'); go('#/', true);
+      } return;
+    }
+    case 'cat': F.cat = v; renderList(); return;
+    case 'tagpanel': F.tagPanel = !F.tagPanel; updateList(); return;
+    case 'ftag': F.tags = F.tags.includes(v) ? F.tags.filter(t => t !== v) : [...F.tags, v]; updateList(); return;
+    case 'cleartags': F.tags = []; updateList(); return;
+    case 'clearfilters': Object.assign(F, { q: '', cat: 'all', tags: [] }); renderList(); return;
+
+    case 'ed-chip': {
+      const f = b.dataset.f;
+      E[f] = (E[f] === v && !b.dataset.req) ? '' : v;
+      document.querySelectorAll(`[data-act="ed-chip"][data-f="${f}"]`).forEach(x => x.setAttribute('aria-pressed', String(E[f] === x.dataset.v)));
+      if (f === 'category') { $('#tagPicker').innerHTML = tagPickerHTML(); $('#dl-type').innerHTML = typeOptionsHTML(); }
+      scheduleDraft(); return;
+    }
+    case 'ed-tag':
+      E.tags = E.tags.includes(v) ? E.tags.filter(t => t !== v) : [...E.tags, v];
+      b.setAttribute('aria-pressed', String(E.tags.includes(v)));
+      scheduleDraft(); return;
+    case 'ed-addtag': addCustomTag(); return;
+    case 'ed-photo': $('#photoInput').click(); return;
+    case 'ed-photo-rm': E.photo = ''; E.thumb = ''; $('#photoBox').innerHTML = photoBoxHTML(); scheduleDraft(); return;
+    case 'ed-save': return saveNote();
+    case 'ed-cancel': {
+      const dirty = JSON.stringify(E) !== E0;
+      if (dirty && !await confirmDialog('入力中の内容は破棄されます。よろしいですか？', '破棄する', true)) return;
+      await clearDraft();
+      const wasEdit = notes.some(n => n.id === E.id); const id2 = E.id; E = null;
+      return go(wasEdit ? '#/n/' + id2 : '#/', true);
+    }
+    case 'ed-discard': {
+      await clearDraft(); E = JSON.parse(E0); draftRestored = false;
+      renderEditor(notes.some(n => n.id === E.id)); toast('下書きを破棄しました'); return;
+    }
+    case 'exp-json': return exportJSON();
+    case 'exp-csv': return exportCSV();
+    case 'imp': { const inp = $('#importInput'); inp.dataset.mode = b.dataset.mode; inp.value = ''; inp.click(); return; }
+    case 'install':
+      if (deferredInstall) { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; renderBackup(); }
+      return;
+  }
+});
+
+function addCustomTag() {
+  const inp = $('#newTag'); const t = inp.value.trim();
+  if (!t) return;
+  if (!E.tags.includes(t)) E.tags.push(t);
+  if (!PRESET_TAGS.has(t) && !customTags.includes(t)) { customTags.push(t); metaSet('customTags', customTags).catch(() => {}); }
+  $('#tagPicker').innerHTML = tagPickerHTML();
+  $('#newTag').focus();
+  scheduleDraft();
+}
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'q') { F.q = t.value; updateList(); return; }
+  if (E && t.name && t.closest('#editor')) { E[t.name] = t.value; scheduleDraft(); }
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.id === 'sort') { F.sort = t.value; updateList(); }
+  else if (t.id === 'photoInput' && t.files[0]) {
+    try { Object.assign(E, await processPhoto(t.files[0])); $('#photoBox').innerHTML = photoBoxHTML(); scheduleDraft(); }
+    catch (err) { toast(err.message, 3500); }
+  }
+  else if (t.id === 'importInput' && t.files[0]) importFile(t.files[0], t.dataset.mode);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'newTag') { e.preventDefault(); addCustomTag(); }
+  if (e.key === 'Enter' && e.target.matches('#editor input[type=text]')) e.preventDefault();
+});
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+
+/* ---------- 起動 ---------- */
+(async function init() {
+  try {
+    db = await openDB();
+    notes = (await dbAll()).map(normalizeNote);
+    customTags = (await metaGet('customTags')) || [];
+    lastBackup = (await metaGet('lastBackup')) || 0;
+  } catch (err) {
+    console.error(err);
+    app.innerHTML = '<div class="empty"><p>データの保存領域を開けませんでした。<br>プライベートブラウズ中や、ブラウザの設定でストレージが無効になっている可能性があります。</p></div>';
+    return;
+  }
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  route();
+})();
+</script>
+</body>
+</html>
