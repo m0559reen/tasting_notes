@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>テイスティングノート</title>
-<meta name="description" content="ウイスキー・ジンのテイスティングノート">
+<meta name="description" content="蒸留酒のテイスティングノート">
 <meta name="theme-color" content="#f6f1ea" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16120f" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -16,43 +16,52 @@
 <style>
 :root{
   --bg:#f6f1ea; --surface:#fffdf9; --surface2:#efe7dc; --ink:#2a211b; --ink2:#6b5d51; --line:#ddd1c2;
-  --accent:#9a5b1c; --accent-ink:#fff; --accent-soft:#f0dfc8; --danger:#b3372b;
-  --whisky:#9a5b1c; --gin:#3f7d6e; --other:#6d6b8a; --rum:#a8452f; --brandy:#7a3d63; --tequila:#4f7a25; --vodka:#3f6aa0; --brew:#7d6f17;
+  --accent:#9a5b1c; --accent-ink:#fff; --accent-soft:#f0dfc8; --danger:#b3372b; --on-c:#fff;
+  --c-whisky:#9a5b1c; --c-gin:#3f7d6e; --c-rum:#a8452f; --c-brandy:#7a3d63; --c-tequila:#4f7a25; --c-vodka:#3f6aa0; --c-liqueur:#86691a; --c-other:#6d6b8a;
   --shadow:0 1px 2px rgba(60,40,20,.08),0 4px 14px rgba(60,40,20,.06);
   --radius:14px;
+  /* 大分類ごとのうっすらした背景色 (--c-page はJSで切り替え) */
+  --c-page:var(--bg); --tint-page:5%; --tint-sheet:7%; --tint-tab:16%;
+  --page-bg:color-mix(in srgb,var(--c-page) var(--tint-page),var(--bg));
+  --sheet-bg:color-mix(in srgb,var(--c-page) var(--tint-sheet),var(--surface));
+  --sheet-line:color-mix(in srgb,var(--c-page) 28%,var(--line));
   --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo",system-ui,sans-serif;
   --font-serif:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
-    --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
-    --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8; --rum:#e08a72; --brandy:#c98bb0; --tequila:#9bc46a; --vodka:#7fa8dc; --brew:#d6c66a;
+    --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a; --on-c:#1c1611;
+    --c-whisky:#d9a05b; --c-gin:#6fb7a5; --c-rum:#e08a72; --c-brandy:#c98bb0; --c-tequila:#9bc46a; --c-vodka:#7fa8dc; --c-liqueur:#d6c66a; --c-other:#a3a1c8;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+    --tint-page:6%; --tint-sheet:8%; --tint-tab:18%;
   }
 }
 :root[data-theme="dark"]{
   --bg:#16120f; --surface:#211b16; --surface2:#2b241d; --ink:#efe6da; --ink2:#a89a8b; --line:#3a3128;
-  --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a;
-  --whisky:#d9a05b; --gin:#6fb7a5; --other:#a3a1c8; --rum:#e08a72; --brandy:#c98bb0; --tequila:#9bc46a; --vodka:#7fa8dc; --brew:#d6c66a;
+  --accent:#d9a05b; --accent-ink:#1c1611; --accent-soft:#3a2c1b; --danger:#e5766a; --on-c:#1c1611;
+  --c-whisky:#d9a05b; --c-gin:#6fb7a5; --c-rum:#e08a72; --c-brandy:#c98bb0; --c-tequila:#9bc46a; --c-vodka:#7fa8dc; --c-liqueur:#d6c66a; --c-other:#a3a1c8;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
+  --tint-page:6%; --tint-sheet:8%; --tint-tab:18%;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{margin:0;background:var(--page-bg);transition:background-color .25s;color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;overflow-x:clip;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-#app{max-width:820px;margin:0 auto;padding:0 16px 96px}
+#app{max-width:1100px;margin:0 auto;padding:0 16px 96px}
+.narrow{max-width:820px;margin:0 auto}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3{margin:0;font-weight:600;line-height:1.35}
 svg.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.12em}
 
 /* header */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 10px;position:sticky;top:0;background:var(--page-bg);z-index:5}
 .top h1{font-family:var(--font-serif);font-size:22px;display:flex;align-items:center;gap:8px;letter-spacing:.02em;white-space:nowrap;min-width:0}
 .top h1 svg{color:var(--accent);font-size:26px;flex:none}
+.top h1 .ttl{overflow:hidden;text-overflow:ellipsis}
 .top-actions{display:flex;gap:8px;align-items:center;flex:none}
-@media (max-width:430px){.top h1{font-size:18px;gap:6px}.top h1 svg{font-size:22px}.top-actions .btn.small{padding:0 12px}.top-actions .btn{padding:0 14px}}
+@media (max-width:430px){.top h1{font-size:17px;gap:5px}.top h1 svg{font-size:22px}.top-actions .btn.small{padding:0 12px}.top-actions .btn{padding:0 14px}}
 .back{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px 0 0;background:none;border:0;color:var(--accent);cursor:pointer;font-weight:600}
 
 /* buttons */
@@ -64,100 +73,232 @@ svg.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;strok
 .btn.small{min-height:36px;padding:0 14px;font-size:14px}
 .btn.block{width:100%}
 
-/* list tools */
-.tools{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
-input[type=search],input[type=text],input[type=date],input[type=number],select,textarea{
-  width:100%;min-height:46px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:16px;-webkit-appearance:none;appearance:none}
-textarea{resize:vertical;min-height:84px;line-height:1.6;field-sizing:content}
+/* inputs */
+input[type=search],input[type=text],input[type=date],select,textarea{
+  width:100%;min-width:0;min-height:44px;padding:9px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:16px;-webkit-appearance:none;appearance:none}
+textarea{resize:vertical;min-height:80px;line-height:1.6;field-sizing:content}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
 select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{min-height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:14.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .chip.tag[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
-.row{display:flex;gap:8px;align-items:center}
-.row>select{flex:1}
+.row{display:flex;gap:8px;align-items:center;min-width:0}
+.row>select,.row>input{flex:1}
+
+/* category tabs (top) */
+.cat-tabs{display:flex;align-items:flex-end;gap:3px;padding:0 10px;margin:4px 0 0;position:relative;z-index:1}
+/* 片側面取りのインデックス: 右上を斜めにカットし、左端に色の縦帯。輪郭は clip-path を2枚重ねて描く */
+.cat-tab{--fill:color-mix(in srgb,var(--c) var(--tint-tab),var(--bg));--edge:var(--line);--cut:12px;
+  flex:1 1 0;min-width:0;height:46px;position:relative;border:0;padding:5px 4px 3px 13px;cursor:pointer;
+  background:var(--edge);clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,0 100%);
+  color:var(--ink2);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;font-size:14px;line-height:1.2;transition:height .15s}
+.cat-tab::after{content:"";position:absolute;inset:1px 1px 0 1px;background:var(--fill);
+  clip-path:polygon(0 0,calc(100% - var(--cut) + .4px) 0,100% calc(var(--cut) - .4px),100% 100%,0 100%)}
+.cat-tab::before{content:"";position:absolute;left:1px;top:1px;bottom:0;width:4px;background:var(--c);opacity:.6;z-index:1}
+.cat-tab span,.cat-tab small{position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cat-tab small{font-size:11px;opacity:.8}
+.cat-tab:hover{color:var(--ink)}
+.cat-tab[aria-selected="true"]{--fill:var(--sheet-bg);--edge:var(--sheet-line);height:56px;margin-bottom:-1px;z-index:2;color:var(--ink);font-weight:700;font-size:15px}
+.cat-tab[aria-selected="true"]::before{opacity:1;width:5px}
+.sheet{background:var(--sheet-bg);border:1px solid var(--sheet-line);border-radius:0 4px 4px 4px;padding:16px;margin-bottom:12px}
+@media (max-width:719px){
+  .cat-tabs{flex-wrap:wrap;row-gap:4px;padding:0 4px}
+  .cat-tab{flex:1 1 22%;height:42px;--cut:10px;padding-left:11px}
+  .cat-tab[aria-selected="true"]{height:48px}
+  .sheet{padding:12px;border-radius:4px}
+}
+/* layout: sub tabs (side) + list */
+.layout{display:grid;grid-template-columns:164px minmax(0,1fr);gap:16px;align-items:start}
+.subtabs{position:sticky;top:calc(var(--head-h,170px) + 10px);display:flex;flex-direction:column;gap:3px}
+.subtab{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:10px;border:0;border-left:3px solid transparent;background:transparent;cursor:pointer;text-align:left;font-size:15px;min-width:0}
+.subtab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subtab small{color:var(--ink2);flex:none}
+.subtab[aria-selected="true"]{background:var(--surface);border-left-color:var(--c-cur);font-weight:700;box-shadow:var(--shadow)}
+@media (max-width:719px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:10px}
+  .subtabs{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+  .subtab{min-height:36px;border:1px solid var(--line);border-radius:999px;padding:0 12px;background:var(--surface);font-size:14px}
+  .subtab[aria-selected="true"]{background:var(--c-cur);border-color:var(--c-cur);color:var(--on-c);box-shadow:none}
+  .subtab[aria-selected="true"] small{color:inherit}
+}
+.toolbar{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+/* 一覧の見出し(タイトル行+大分類タブ)を画面上部に固定 */
+.lhead{position:sticky;top:0;z-index:6;background:var(--page-bg)}
+.lhead .top{position:static;transition:padding .15s}
+.lhead .top h1{transition:font-size .15s}
+.lhead.stuck{box-shadow:0 8px 10px -9px rgba(0,0,0,.28)}
+.lhead.stuck .top{padding:6px 0 6px}
+.lhead.stuck .top h1{font-size:18px}
+.lhead.stuck::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--sheet-line)}
+/* 検索・並べ替えは広い画面では1行にまとめ、見出しの直下に固定 */
+@media (min-width:720px){
+  .toolbar{position:sticky;top:var(--head-h,170px);z-index:4;background:var(--sheet-bg);padding:8px 0 10px;margin:-8px 0 2px;flex-direction:row;flex-wrap:wrap;align-items:center}
+  .toolbar>#q{flex:1 1 220px}
+  .toolbar>.row{flex:0 0 auto}
+  .toolbar>#tagPanel{flex:1 1 100%}
+  #sort{width:auto}
+}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface);flex:none}
+.seg button{min-height:36px;min-width:40px;padding:0 10px;border:0;background:transparent;cursor:pointer;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:4px;font-size:13.5px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--c-cur,var(--accent));color:var(--on-c);font-weight:700}
+.seg svg.ic{font-size:17px}
+/* コンパクト表示 */
+.citem{display:flex;align-items:center;gap:12px;padding:8px 14px;border-top:1px solid var(--line);min-height:46px}
+.citem:first-child{border-top:0}
+.citem:hover,.citem:active{background:var(--surface2)}
+.c-main{min-width:0;flex:1;display:flex;align-items:baseline;gap:10px}
+.c-name{font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:4em}
+.c-meta{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 0;min-width:0}
+.c-side{flex:none;display:flex;gap:6px;align-items:center}
+.c-side time{font-size:12.5px;color:var(--ink2);min-width:5.6em;text-align:right}
+@media (max-width:560px){
+  .c-main{flex-direction:column;gap:0}
+  .c-name{max-width:100%}
+  .c-side .pill:nth-of-type(n+2){display:none}
+}
+/* 上へ戻るボタン */
+.to-top{position:fixed;right:calc(18px + env(safe-area-inset-right));bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;width:48px;height:48px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;
+  opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s}
+.to-top.show{opacity:.95;transform:none;pointer-events:auto}
+.to-top svg.ic{font-size:22px;stroke-width:2}
+body.has-savebar .to-top{bottom:calc(86px + env(safe-area-inset-bottom))}
 #tagPanel{padding:12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
-.count{color:var(--ink2);font-size:14px;margin:6px 2px}
+.count{color:var(--ink2);font-size:13.5px;margin:0 2px 6px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.count a{color:var(--accent);text-decoration:underline;cursor:pointer}
 
-/* notice */
-.notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:var(--accent-soft);font-size:14px;margin:6px 0}
-.notice button{flex:none}
-
-/* cards */
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
-@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-.card{display:flex;gap:12px;padding:12px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);min-height:96px}
-.card:active{background:var(--surface2)}
-.card .thumb{flex:none;width:84px;height:84px;border-radius:10px;object-fit:cover;background:var(--surface2)}
-.card .ph{flex:none;width:84px;height:84px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:34px;opacity:.7}
-.card-body{min-width:0;flex:1}
-.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2)}
-.card h3{font-size:17px;margin:2px 0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.sub{margin:0;color:var(--ink2);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.snip{margin:4px 0 0;font-size:13.5px;color:var(--ink2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.badge{display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;line-height:20px;color:#fff}
-.badge.whisky{background:var(--whisky)} .badge.gin{background:var(--gin)} .badge.rum{background:var(--rum)} .badge.brandy{background:var(--brandy)} .badge.tequila{background:var(--tequila)} .badge.vodka{background:var(--vodka)} .badge.brew{background:var(--brew)} .badge.other{background:var(--other)}
-:root[data-theme="dark"] .badge{color:#1c1611}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge{color:#1c1611}}
-.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-.tagpill{padding:0 8px;border-radius:999px;background:var(--accent-soft);font-size:12px;line-height:20px;white-space:nowrap}
-.empty{text-align:center;padding:56px 16px;color:var(--ink2)}
-.empty svg{font-size:56px;color:var(--accent);opacity:.6}
+/* list (1 column) */
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.item{display:flex;gap:12px;padding:11px 14px;border-top:1px solid var(--line);align-items:flex-start;min-height:74px}
+.item:first-child{border-top:0}
+.item:hover,.item:active{background:var(--surface2)}
+.item .thumb,.item .ph{flex:none;width:54px;height:54px;border-radius:9px;object-fit:cover;background:var(--surface2)}
+.item .ph{display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:24px;opacity:.7}
+.it-body{min-width:0;flex:1}
+.it-top{display:flex;align-items:baseline;gap:10px;justify-content:space-between}
+.it-top h3{font-size:16.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.it-top time{flex:none;font-size:12.5px;color:var(--ink2)}
+.it-line{display:flex;flex-wrap:wrap;gap:1px 12px;margin-top:2px;font-size:13.5px;color:var(--ink2);min-width:0}
+.mi{display:inline-flex;align-items:center;gap:4px;min-width:0;max-width:100%}
+.mi>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi svg.ic,.grp>svg.ic,.it-comment svg.ic,.lg svg.ic,.kv dt svg.ic,.d-line svg.ic{flex:none;font-size:14px;color:var(--c-cur);stroke-width:1.8}
+.sublbl{color:var(--c-cur);font-weight:700}
+.it-comment{display:flex;gap:6px;align-items:flex-start;margin-top:4px;font-size:14px;color:var(--ink)}
+.it-comment svg.ic{margin-top:4px}
+.it-comment span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.it-pills{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:6px}
+.grp{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-width:0}
+.pill{padding:0 8px;border-radius:999px;font-size:12px;line-height:19px;white-space:nowrap;border:1px solid transparent;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pill.tag{background:var(--accent-soft)}
+.pill.serve{border-color:var(--line)}
+.pill.r3{background:var(--c-cur);border-color:var(--c-cur);color:var(--on-c);font-weight:700}
+.pill.r2{border-color:var(--c-cur);color:var(--ink);font-weight:600}
+.pill.r1{border-color:var(--line);color:var(--ink2)}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px;padding:10px 14px;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:13px;color:var(--ink2)}
+.lg{display:flex;align-items:center;gap:6px;min-width:0}
+.lg .pill{flex:none}
+.empty{text-align:center;padding:48px 16px;color:var(--ink2)}
+.empty svg{font-size:52px;color:var(--c-cur,var(--accent));opacity:.6}
 .empty p{margin:10px 0 18px}
 
-/* detail */
-.detail-photo{width:100%;max-height:52vh;object-fit:contain;background:var(--surface2);border-radius:var(--radius);margin:4px 0 14px}
-.d-title{font-family:var(--font-serif);font-size:26px;margin:6px 0 4px}
-.d-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--ink2);font-size:14.5px;margin:0 0 6px}
+/* notice / sections */
+.notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:var(--accent-soft);font-size:14px;margin:0 0 12px}
+.notice button{flex:none}
 .section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:12px 0}
-.section h2{font-size:14px;color:var(--ink2);margin-bottom:8px;letter-spacing:.04em}
-.kv{display:grid;grid-template-columns:5.5em 1fr;gap:6px 12px;margin:0}
-.kv dt{color:var(--ink2);font-size:14px}
+.section>h2{font-size:14px;color:var(--ink2);margin-bottom:10px;letter-spacing:.04em}
+.section p{margin:6px 0;font-size:14.5px}
+.muted{color:var(--ink2);font-size:13.5px}
+.section ul{margin:6px 0;padding-left:1.3em;font-size:14.5px}
+
+/* detail */
+.badge{display:inline-block;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:700;line-height:22px;color:var(--on-c);background:var(--c-cur)}
+.badge-sub{font-size:13.5px;color:var(--ink2);margin-left:8px}
+.detail-photo{width:100%;max-height:44vh;object-fit:contain;background:var(--surface2);border-radius:var(--radius);margin:4px 0 12px}
+.d-title{font-family:var(--font-serif);font-size:26px;margin:8px 0 2px;word-break:break-word}
+.d-producer{color:var(--ink2);margin:0 0 6px}
+.kv{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:6px 12px;margin:0}
+.kv dt{color:var(--ink2);font-size:14px;display:flex;gap:5px;align-items:flex-start}
+.kv dt svg.ic{margin-top:4px}
 .kv dd{margin:0;white-space:pre-wrap;word-break:break-word}
-.kv dd.empty-v{color:var(--ink2);opacity:.6}
+.d-line{display:flex;gap:6px;align-items:flex-start;margin:0 0 6px}
+.d-line svg.ic{margin-top:5px}
+.d-summary{font-size:16px}
+.rate{display:inline-flex;align-items:center;justify-content:center;min-width:1.7em;height:1.7em;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid var(--c-cur);color:var(--c-cur);align-self:center}
+.rate.r3{background:var(--c-cur);color:var(--on-c)}
+.rate.r1{border-color:var(--line);color:var(--ink2)}
+.serve-sum{margin:0 0 12px}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.sec-head h2{font-size:14px;color:var(--ink2);letter-spacing:.04em;margin:0}
+.sec-head .seg button{min-height:32px;font-size:13px}
+/* 詳細: 飲み方ごとにまとめた記録 */
+.sgrp{border-top:1px solid var(--line)}
+.sgrp:first-of-type{border-top:0}
+.sgrp>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:10px 2px}
+.sgrp>summary::-webkit-details-marker{display:none}
+.sgrp .g-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;min-width:0}
+.sgrp .g-top b{font-size:16px}
+.sgrp .g-meta{font-size:13px;color:var(--ink2)}
+.sgrp .g-last{grid-column:2;font-size:14px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sgrp[open] .g-last{display:none}
+.sgrp .chev{grid-row:1/span 2;grid-column:3;width:8px;height:8px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);margin:0 6px;transition:transform .15s}
+.sgrp[open] .chev{transform:rotate(-135deg)}
+.sgrp .rate{grid-row:1/span 2}
+.rate.r0{border-style:dashed;border-color:var(--line);color:var(--ink2);font-weight:400}
+.g-body{padding:0 0 12px 40px}
+.g-body .sess-view{padding:8px 0}
+.g-body .sess-view h3{font-size:14px;font-weight:600}
+.g-body .sess-view p{font-size:15px}
+.chip-grp-lbl{font-size:12.5px;color:var(--ink2);margin:8px 0 4px}
+.chip-grp-lbl:first-of-type{margin-top:0}
+.shot-calc{grid-column:span 6;font-size:13.5px;color:var(--ink2);margin:-6px 0 12px}
+.shot-calc:empty{display:none}
+.sess-view{padding:10px 0;border-top:1px solid var(--line)}
+.sess-view:first-of-type{border-top:0;padding-top:0}
+.sess-view h3{font-size:16px;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}
+.sess-view .when{font-size:13.5px;color:var(--ink2);font-weight:400}
+.sess-view p{margin:4px 0 0;white-space:pre-wrap;word-break:break-word}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
-.same a{display:block;padding:8px 0;border-top:1px solid var(--line)}
-.same a:first-of-type{border-top:0}
-.same time{font-size:13px;color:var(--ink2);margin-right:8px}
 
 /* editor */
-.field{margin:0 0 14px}
-.field label,.field .lbl{display:block;font-size:14px;color:var(--ink2);margin:0 0 5px}
-.field .hint{font-size:12.5px;color:var(--ink2);margin-top:4px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-@media (max-width:480px){.three{grid-template-columns:1fr 1fr}}
+.field{margin:0 0 14px;min-width:0}
+.field>label,.field>.lbl{display:block;font-size:14px;color:var(--ink2);margin:0 0 5px}
+.fgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0 12px}
+.fgrid>.field{grid-column:span 6}
+.fgrid>.w2{grid-column:span 2}.fgrid>.w3{grid-column:span 3}.fgrid>.w4{grid-column:span 4}
+@media (max-width:480px){.fgrid>.w2,.fgrid>.w3{grid-column:span 3}.fgrid>.w4{grid-column:span 6}}
+.chips+input,.chips+.add-row{margin-top:8px}
+.add-row{display:flex;gap:8px}
+.add-row input{flex:1}
 .tag-group{margin:0 0 12px}
 .tag-group h3{font-size:13px;color:var(--ink2);margin:0 0 6px}
-.add-tag{display:flex;gap:8px;margin-top:8px}
-.photo-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.photo-box img{width:120px;height:120px;object-fit:cover;border-radius:12px;background:var(--surface2)}
-.savebar{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:5}
-.savebar .btn{flex:1}
-.hidden-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-
-/* sessions */
+.cat-pick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.cat-pick .chip{width:100%}
+.cat-pick .chip[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:var(--on-c)}
 .sess{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px;background:var(--surface2)}
-.sess-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.sess-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;gap:8px;cursor:pointer;list-style:none;min-height:36px}
+.sess-head::-webkit-details-marker{display:none}
+.sess-head>span{display:flex;align-items:center;gap:6px;min-width:0}
+.sess-head>span::before{content:"";flex:none;width:7px;height:7px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(-45deg);transition:transform .15s;margin-right:4px}
+.sess[open]>.sess-head{margin-bottom:8px}
+.sess[open]>.sess-head>span::before{transform:rotate(45deg)}
 .sess .field{margin-bottom:12px}
 .sess input[type=text],.sess input[type=date],.sess textarea{background:var(--surface)}
-.sess-view{padding:12px 0;border-top:1px solid var(--line)}
-.sess-view:first-of-type{border-top:0;padding-top:0}
-.sess-view h3{font-size:16px;display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
-.sess-view .when{font-size:13.5px;color:var(--ink2);font-weight:400}
-.sess-view p{margin:6px 0 0;white-space:pre-wrap;word-break:break-word}
-.servepill{padding:0 8px;border-radius:999px;border:1px solid var(--accent);font-size:12px;line-height:18px;white-space:nowrap}
 .dup-hint{margin:-6px 0 12px;font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .dup-hint:empty{display:none}
+.photo-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.photo-box img{width:112px;height:112px;object-fit:cover;border-radius:12px;background:var(--surface2)}
+.savebar{position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--page-bg) 70%,transparent);z-index:5}
+.savebar .btn{flex:1}
+.hidden-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.req{color:var(--danger)}
 
 /* backup */
 .stat{display:flex;gap:20px;flex-wrap:wrap;color:var(--ink2);font-size:14px}
 .stat b{color:var(--ink);font-size:20px;margin-right:3px}
 .btn-col{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.section p{margin:6px 0;font-size:14.5px}
-.section p.muted,.muted{color:var(--ink2);font-size:13.5px}
-.section ul{margin:6px 0;padding-left:1.3em;font-size:14.5px}
+.btn-col .btn{white-space:normal;text-align:center;padding-top:8px;padding-bottom:8px}
 
 /* overlays */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
@@ -174,42 +315,195 @@ select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <script>
 'use strict';
 /* ============================================================
-   テイスティングノート  (ローカル保存 / 同期なし / PWA)
+   テイスティングノート v4  (ローカル保存 / 同期なし / PWA)
    データはこの端末のブラウザ内 IndexedDB に保存されます。
    ============================================================ */
 
-/* ---------- 定数 ---------- */
-const CATS = { whisky: 'ウイスキー', gin: 'ジン', rum: 'ラム', brandy: 'ブランデー', tequila: 'テキーラ', vodka: 'ウォッカ', brew: '醸造酒', other: 'その他' };
-const PLACES = ['自店', '他店', '自宅', 'イベント', 'その他'];
-const SERVES = ['ストレート', 'ロック', 'トワイスアップ', '水割り', 'ソーダ割り', 'ジントニック', 'カクテル', 'その他'];
-const TYPE_SUGGEST = {
-  whisky: ['シングルモルト', 'ブレンデッド', 'ブレンデッドモルト', 'グレーン', 'バーボン', 'ライ', 'テネシー', 'ジャパニーズ', 'アイリッシュ', 'カナディアン'],
-  gin: ['ロンドンドライ', 'プリマス', 'オールドトム', 'ニューウェスタン', 'ジェネヴァ', 'クラフト', 'ジャパニーズクラフト', 'シップスミス', 'スロージン'],
-  rum: ['ホワイト', 'ゴールド', 'ダーク', 'スパイスド', 'アグリコール', 'ジャパニーズ'],
-  brandy: ['コニャック', 'アルマニャック', 'カルヴァドス', 'グラッパ', 'フルーツブランデー', 'VS', 'VSOP', 'XO'],
-  tequila: ['ブランコ', 'レポサド', 'アネホ', 'エクストラアネホ', 'ホベン', 'メスカル'],
-  vodka: ['プレーン', 'フレーバード', 'ライ麦', 'ジャガイモ', '小麦'],
-  brew: ['日本酒', 'ワイン', 'ビール', 'クラフトビール', 'シードル', 'マッコリ', 'ミード'],
-  other: ['リキュール', '焼酎', '泡盛', 'ベルモット', 'アマーロ'],
-};
-const TAG_GROUPS = [
-  { g: 'フルーツ', t: ['シトラス', '青りんご・洋梨', 'トロピカル', '赤い果実', 'ドライフルーツ', 'レーズン'] },
-  { g: '花・ハーブ', t: ['フローラル', 'ハーバル', 'ミント', '紅茶・茶葉', '牧草'] },
-  { g: '甘み・菓子', t: ['バニラ', 'キャラメル', '蜂蜜', 'チョコレート', 'ナッツ', '麦芽(モルト)', 'クリーミー'] },
-  { g: 'スパイス・木', t: ['スパイシー', 'ペッパー', 'シナモン', 'ジンジャー', 'ウッディ・オーク', 'シェリー樽'] },
-  { g: '燻製・海', t: ['スモーキー', 'ピーティ', 'ヨード・潮', 'タール・焦げ', 'ミネラル'] },
-  { g: 'ボタニカル', t: ['ジュニパー', 'コリアンダー', 'アンジェリカ', 'カルダモン', '柚子', '山椒', 'ローズ', 'ラベンダー', 'リコリス'], only: ['gin', 'vodka', 'other'] },
-  { g: '原料由来', t: ['糖蜜・黒糖', 'サトウキビ', 'アガベ', 'ぶどう', '穀物', '草っぽい', '塩気'], only: ['rum', 'brandy', 'tequila', 'vodka'] },
-  { g: '醸造酒の特徴', t: ['酸味', '果実味', '旨味', '渋み', '発泡感', '米・麹', '吟醸香', 'ホップ'], only: ['brew'] },
-  { g: '質感・印象', t: ['甘口', 'ドライ', 'オイリー', '滑らか', '力強い', '軽やか', '長い余韻', '樽感強め'] },
+/* ---------- 酒類ごとの定義 ----------
+   fields の type:  text=自由入力 / one=1つ選ぶ(free:trueで自由入力も) / many=複数選ぶ(free:trueで追加可)
+   opts はリスト、または中分類ごとの {中分類キー: [...], _: 既定} 。showIf は表示する中分類。
+   w は入力欄の幅 (6分割グリッド。省略時は全幅)。                                     */
+const MEMO = { k: 'memo', label: '備考', type: 'text', ph: '限定情報・入手先など' };
+const CATS = [
+  { k: 'whisky', label: 'ウイスキー', producer: '蒸留所', fallback: 'other',
+    subs: [['scotch', 'スコッチ'], ['irish', 'アイリッシュ'], ['american', 'アメリカン'], ['canadian', 'カナディアン'], ['japanese', 'ジャパニーズ'], ['other', 'その他']],
+    fields: [
+      { k: 'type', label: 'タイプ', type: 'one', opts: {
+        scotch: ['シングルモルト', 'ブレンデッド', 'ブレンデッドモルト', 'シングルグレーン'],
+        irish: ['シングルモルト', 'シングルポットスチル', 'ブレンデッド', 'シングルグレーン'],
+        american: ['バーボン', 'ライ', 'テネシー', 'コーン', 'ウィート', 'アメリカンシングルモルト'],
+        canadian: ['ブレンデッド', 'ライ', 'シングルモルト'],
+        japanese: ['シングルモルト', 'ブレンデッド', 'ブレンデッドモルト', 'シングルグレーン'],
+        _: ['シングルモルト', 'ブレンデッド', 'グレーン'] } },
+      { k: 'region', label: '地域', type: 'one', free: true, opts: {
+        scotch: ['スペイサイド', 'ハイランド', 'ローランド', 'アイラ', 'キャンベルタウン', 'アイランズ'],
+        american: ['ケンタッキー', 'テネシー', 'インディアナ', 'テキサス', 'ニューヨーク'],
+        other: ['台湾', 'インド', 'イングランド', 'オーストラリア', 'フランス', 'ドイツ'], _: [] },
+        ph: { japanese: '例：大阪、北海道', other: '国・地域', _: '地域' } },
+      { k: 'age', label: '熟成年数', type: 'text', w: 2, ph: '12 / NAS', fmt: 'age' },
+      { k: 'vintage', label: '蒸留年／ボトリング年', type: 'text', w: 4, ph: '例：2008 / 2022' },
+      { k: 'bottler', label: 'ボトリング', type: 'one', opts: ['オフィシャル', 'ボトラーズ'] },
+      { k: 'bottlerName', label: 'ボトラー名', type: 'text', ph: '例：シグナトリー、ゴードン&マクファイル' },
+      { k: 'cask', label: '樽', type: 'many', free: true, opts: ['バーボン樽', 'シェリー樽', 'オロロソ', 'PX', 'ポート', 'ワイン樽', 'ラム樽', 'ミズナラ', '新樽', 'リフィル'] },
+      { k: 'peat', label: 'ピート', type: 'one', opts: ['ノンピート', 'ライト', 'ミディアム', 'ヘビー'] },
+      { k: 'mashbill', label: 'マッシュビル', type: 'text', ph: '例：コーン75% ライ13% 大麦12%', showIf: ['american', 'canadian'] },
+      { k: 'feat', label: '仕様', type: 'many', opts: ['カスクストレングス', 'シングルカスク', 'ノンチルフィルタード', 'ノンカラーリング', '限定品'] },
+      MEMO],
+    list: ['type', 'region', 'age', 'cask', 'peat'],
+    tags: [{ g: '燻製・海', t: ['スモーキー', 'ピーティ', 'ヨード・潮', 'タール・焦げ', 'ミネラル'] }, { g: '樽・麦', t: ['シェリー感', '麦芽(モルト)', '樽感強め', 'レーズン'] }],
+    serves: ['ストレート', 'ロック', 'トワイスアップ', '水割り', 'ハイボール', 'お湯割り'],
+    cocktails: null },
+
+  { k: 'gin', label: 'ジン', producer: '蒸留所・ブランド', fallback: 'other',
+    subs: [['london', 'ロンドンドライ'], ['japanese', 'ジャパニーズクラフト'], ['newwestern', 'ニューウェスタン'], ['oldtom', 'オールドトム・ジュネヴァ'], ['flavored', 'フレーバード'], ['other', 'その他']],
+    fields: [
+      { k: 'country', label: '生産国', type: 'one', free: true, opts: { japanese: ['日本'], london: ['イギリス', 'スペイン', 'ドイツ'], _: ['イギリス', '日本', 'ドイツ', 'スペイン', 'フランス', 'オランダ', 'アメリカ', 'オーストラリア'] } },
+      { k: 'base', label: 'ベーススピリッツ', type: 'one', free: true, opts: ['穀物', '大麦', 'ライ麦', '小麦', '米', 'ぶどう', 'サトウキビ'] },
+      { k: 'botanicals', label: 'キーボタニカル', type: 'many', free: true, opts: {
+        japanese: ['ジュニパー', '柚子', '山椒', '玉露・緑茶', '桜', 'ヒノキ', '紫蘇', '生姜'],
+        _: ['ジュニパー', 'コリアンダー', 'アンジェリカ', 'オリスルート', 'シトラスピール', 'カルダモン', 'キュウリ', 'ローズ', 'ラベンダー', 'リコリス'] } },
+      { k: 'feat', label: '仕様', type: 'many', opts: ['ネイビーストレングス', '樽熟成', '限定品'] },
+      MEMO],
+    list: ['country', 'base', 'botanicals'],
+    tags: [{ g: 'ジンの印象', t: ['ジュニパー強め', '柑橘感', 'グリーン・草', '和の香り', 'クリーン'] }],
+    serves: ['ストレート', 'ロック', 'フリーザー', 'ソーダ割り', 'トニック割り'],
+    cocktails: ['ジントニック', 'マティーニ', 'ネグローニ', 'ギムレット', 'トム・コリンズ', 'ジン・フィズ', 'ホワイト・レディ', 'ジン・リッキー'] },
+
+  { k: 'rum', label: 'ラム', producer: '蒸留所・ブランド', fallback: 'other',
+    subs: [['white', 'ホワイト'], ['gold', 'ゴールド'], ['dark', 'ダーク'], ['spiced', 'スパイスド'], ['agricole', 'アグリコール'], ['other', 'その他']],
+    fields: [
+      { k: 'country', label: '生産国・地域', type: 'one', free: true, opts: { agricole: ['マルティニーク', 'グアドループ', 'マリー・ガラント', 'レユニオン'], _: ['ジャマイカ', 'バルバドス', 'キューバ', 'プエルトリコ', 'ガイアナ', 'トリニダード・トバゴ', 'グアテマラ', 'ベネズエラ', '日本'] } },
+      { k: 'material', label: '原料', type: 'one', opts: ['糖蜜', 'サトウキビジュース', 'サトウキビシロップ', '黒糖'] },
+      { k: 'still', label: '蒸留器', type: 'one', opts: ['ポットスチル', 'コラムスチル', 'ブレンド'] },
+      { k: 'age', label: '熟成年数', type: 'text', w: 2, ph: '例：8', fmt: 'age' },
+      { k: 'feat', label: '仕様', type: 'many', opts: ['ソレラ', 'シングルカスク', 'カスクストレングス', '加糖なし', 'ネイビー'] },
+      MEMO],
+    list: ['country', 'material', 'age'],
+    tags: [{ g: 'ラムらしさ', t: ['糖蜜・黒糖', 'バナナ', 'ファンキー(エステリー)', '焦がし砂糖', '草っぽさ'] }],
+    serves: ['ストレート', 'ロック', 'ソーダ割り', 'トニック割り', 'コーラ割り'],
+    cocktails: ['ダイキリ', 'モヒート', 'キューバ・リブレ', 'マイタイ', 'ピニャ・コラーダ', 'エル・プレジデンテ', 'ホット・バタード・ラム'] },
+
+  { k: 'brandy', label: 'ブランデー', producer: 'メゾン・生産者', fallback: 'other',
+    subs: [['cognac', 'コニャック'], ['armagnac', 'アルマニャック'], ['calvados', 'カルヴァドス'], ['grappa', 'グラッパ・マール'], ['other', 'その他']],
+    fields: [
+      { k: 'grade', label: '熟成表記', type: 'one', free: true, opts: { grappa: ['ジョーヴァネ', 'インヴェッキアータ', 'リゼルヴァ'], _: ['VS', 'VSOP', 'XO', 'XXO', "Hors d'Âge", 'ナポレオン', 'ヴィンテージ'] } },
+      { k: 'cru', label: '産地・クリュ', type: 'one', free: true, opts: {
+        cognac: ['グランド・シャンパーニュ', 'プティット・シャンパーニュ', 'フィン・シャンパーニュ', 'ボルドリ', 'ファン・ボワ', 'ボン・ボワ'],
+        armagnac: ['バ・アルマニャック', 'テナレーズ', 'オー・アルマニャック'],
+        calvados: ['ペイ・ドージュ', 'ドンフロンテ', 'AOCカルヴァドス'], _: [] } },
+      { k: 'material', label: '原料', type: 'one', free: true, opts: { calvados: ['りんご', 'りんご・洋梨'], grappa: ['ぶどうの搾りかす'], _: ['ぶどう', 'りんご', '洋梨', 'さくらんぼ', 'プラム'] } },
+      { k: 'age', label: '熟成年数', type: 'text', w: 2, ph: '例：20', fmt: 'age' },
+      { k: 'vintage', label: 'ヴィンテージ', type: 'text', w: 2, ph: '例：1990' },
+      { k: 'feat', label: '仕様', type: 'many', opts: ['シングルエステート', 'シングルカスク', 'カスクストレングス', 'ノンリデュース', '限定品'] },
+      MEMO],
+    list: ['grade', 'cru', 'age'],
+    tags: [{ g: 'ブランデーらしさ', t: ['ぶどう感', 'りんご', 'ランシオ', 'オーク', 'フローラル強め'] }],
+    serves: ['ストレート', 'ロック', 'トワイスアップ', 'ソーダ割り', 'トニック割り'],
+    cocktails: ['サイドカー', 'ブランデー・アレキサンダー', 'ヴュー・カレ', 'ジャック・ローズ', 'ホーセズ・ネック', 'フレンチ・コネクション', 'ビトウィーン・ザ・シーツ'] },
+
+  { k: 'tequila', label: 'テキーラ', producer: '蒸留所・ブランド', fallback: 'other',
+    subs: [['blanco', 'ブランコ'], ['reposado', 'レポサド'], ['anejo', 'アネホ'], ['extra', 'エクストラアネホ'], ['mezcal', 'メスカル'], ['other', 'その他']],
+    fields: [
+      { k: 'agave', label: 'アガベ品種', type: 'one', free: true, opts: { mezcal: ['エスパディン', 'トバラ', 'テペスタテ', 'アロケーニョ', 'クイシェ'], _: ['ブルーアガベ'] } },
+      { k: 'region', label: '産地', type: 'one', free: true, opts: { mezcal: ['オアハカ', 'ゲレーロ', 'ドゥランゴ', 'ミチョアカン'], _: ['ハイランド(ロス・アルトス)', 'ローランド(バジェ)'] } },
+      { k: 'cook', label: '加熱方法', type: 'one', free: true, opts: { mezcal: ['地中窯(ピット)', 'レンガ窯'], _: ['レンガ窯', 'オートクレーブ', 'ディフューザー'] } },
+      { k: 'nom', label: 'NOM', type: 'text', w: 2, ph: '例：1414' },
+      { k: 'age', label: '熟成期間', type: 'text', w: 2, ph: '例：8ヶ月' },
+      { k: 'feat', label: '仕様', type: 'many', opts: ['100%アガベ', 'ミクスト', 'アディティブフリー', 'タオナ(石臼)', 'スティルストレングス', '限定品'] },
+      MEMO],
+    list: ['agave', 'region', 'age'],
+    tags: [{ g: 'アガベ・大地', t: ['アガベ', 'グリーンペッパー', '土っぽさ', 'スモーキー', '塩気・ミネラル', '柑橘の皮'] }],
+    serves: ['ストレート', 'ロック', 'ソーダ割り', 'トニック割り'],
+    cocktails: ['マルガリータ', 'トミーズ・マルガリータ', 'パロマ', 'テキーラ・サンライズ', 'エル・ディアブロ', 'マタドール'] },
+
+  { k: 'vodka', label: 'ウォッカ', producer: 'ブランド', fallback: 'plain',
+    subs: [['plain', 'プレーン'], ['flavored', 'フレーバード'], ['other', 'その他']],
+    fields: [
+      { k: 'country', label: '生産国', type: 'one', free: true, opts: ['ポーランド', 'ロシア', 'スウェーデン', 'フィンランド', 'フランス', 'アメリカ', '日本'] },
+      { k: 'material', label: '原料', type: 'one', free: true, opts: ['小麦', 'ライ麦', '大麦', 'じゃがいも', 'とうもろこし', 'ぶどう', '米'] },
+      { k: 'filter', label: 'ろ過・製法', type: 'text', ph: '例：白樺炭ろ過、多回蒸留' },
+      { k: 'flavor', label: 'フレーバー', type: 'text', ph: '例：シトラス、バイソングラス', showIf: ['flavored'] },
+      MEMO],
+    list: ['country', 'material', 'flavor'],
+    tags: [{ g: 'ウォッカらしさ', t: ['クリーン', '穀物感', 'ミネラル', 'ほのかな甘み', 'クリーミー'] }],
+    serves: ['ストレート', 'フリーザー', 'ロック', 'ソーダ割り', 'トニック割り'],
+    cocktails: ['モスコミュール', 'ソルティ・ドッグ', 'スクリュードライバー', 'ブラッディ・メアリー', 'コスモポリタン', 'ウォッカ・マティーニ', 'ブラック・ルシアン'] },
+
+  { k: 'liqueur', label: 'リキュール', producer: 'メーカー', fallback: 'other',
+    subs: [['herb', 'ハーブ・スパイス'], ['fruit', 'フルーツ'], ['nut', 'ナッツ・コーヒー'], ['cream', 'クリーム'], ['bitter', 'ビター・アマーロ'], ['other', 'その他']],
+    fields: [
+      { k: 'flavorMain', label: '主な風味・原料', type: 'text', ph: '例：オレンジ、アーモンド、薬草' },
+      { k: 'base', label: 'ベースの酒', type: 'one', free: true, opts: ['ニュートラルスピリッツ', 'ブランデー', 'ウイスキー', 'ラム', 'ワイン', '焼酎'] },
+      { k: 'sweet', label: '甘さ', type: 'one', opts: ['甘口', '中口', 'ドライ'] },
+      { k: 'country', label: '生産国', type: 'text', w: 3 },
+      MEMO],
+    list: ['flavorMain', 'base', 'sweet'],
+    tags: [{ g: 'リキュールの印象', t: ['甘さ強め', 'ビター', '薬草感', '果実味', 'コーヒー'] }],
+    serves: ['ストレート', 'ロック', 'ソーダ割り', 'トニック割り', 'ジュース割り', 'ミルク割り'],
+    cocktails: ['ネグローニ', 'スプモーニ', 'カシス・オレンジ', 'ゴッドファーザー', 'アレキサンダー', 'ファジー・ネーブル', 'アマレット・サワー', 'エスプレッソ・マティーニ'] },
+
+  { k: 'other', label: 'その他', producer: '蔵元・メーカー', fallback: 'other',
+    subs: [['shochu', '焼酎・泡盛'], ['brew', '醸造酒'], ['other', 'その他']],
+    fields: [
+      { k: 'kind', label: '種別', type: 'text', ph: { shochu: '例：芋焼酎、泡盛 古酒', brew: '例：日本酒 純米吟醸、ワイン', _: '例：アクアビット、ピスコ' } },
+      { k: 'material', label: '原料', type: 'text', w: 3 },
+      { k: 'region', label: '産地', type: 'text', w: 3 },
+      { k: 'age', label: '熟成年数', type: 'text', w: 2, fmt: 'age' },
+      MEMO],
+    list: ['kind', 'region', 'age'],
+    tags: [{ g: '原料の個性', t: ['旨味', '酸味', '米・麹', '芋', '麦', '黒糖'] }],
+    serves: ['ストレート', 'ロック', '水割り', 'お湯割り', 'ソーダ割り'],
+    cocktails: null },
 ];
-const PRESET_TAGS = new Set(TAG_GROUPS.flatMap(x => x.t));
-const FIELDS = ['category', 'name', 'brand', 'type', 'region', 'abv', 'age', 'price', 'color', 'nose', 'palate', 'finish'];
-const ICON_GLASS = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8c.6 3 1 5 .2 8-.5 2-1.8 3.2-3.2 3.7V19h3v2H8v-2h3v-4.3C9.6 14.2 8.3 13 7.8 11 7 8 7.4 6 8 3z"/></svg>';
+const SC = Object.fromEntries(CATS.map(c => [c.k, c]));
+const BASE_TAGS = [
+  { g: 'フルーツ', t: ['シトラス', '青りんご・洋梨', 'トロピカル', '赤い果実', 'ドライフルーツ'] },
+  { g: '花・ハーブ', t: ['フローラル', 'ハーバル', 'ミント', '紅茶・茶葉'] },
+  { g: '甘み', t: ['バニラ', 'キャラメル', '蜂蜜', 'チョコレート', 'ナッツ'] },
+  { g: 'スパイス・木', t: ['スパイシー', 'ペッパー', 'シナモン', 'ジンジャー', 'ウッディ'] },
+  { g: '質感・印象', t: ['甘口', 'ドライ', 'オイリー', '滑らか', '力強い', '軽やか', '長い余韻'] },
+];
+const PLACES = ['自店', '他店', '自宅', 'イベント', 'その他'];
+const TASTE = [['color', '色', '例：深みのある琥珀色、無色透明'], ['nose', '香り(ノーズ)', ''], ['palate', '味わい(パレット)', ''], ['finish', '余韻(フィニッシュ)', '']];
+const ICONS = {
+  glass: '<path d="M8 3h8c.6 3 1 5 .2 8-.5 2-1.8 3.2-3.2 3.7V19h3v2H8v-2h3v-4.3C9.6 14.2 8.3 13 7.8 11 7 8 7.4 6 8 3z"/>',
+  factory: '<path d="M3 21h18M4 21V11l5 3v-3l5 3V4h5v17"/><path d="M8 18h1M12 18h1"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  hourglass: '<path d="M6 3h12M6 21h12M7 3c0 6 10 6 10 9s-10 3-10 9M17 3c0 6-10 6-10 9s10 3 10 9"/>',
+  calendar: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  barrel: '<ellipse cx="12" cy="12" rx="7" ry="9"/><path d="M5.6 8h12.8M5.6 16h12.8"/>',
+  smoke: '<path d="M8 21c-2-3 2-5 0-8s2-6 3-9M14 21c-2-3 2-5 0-8s2-5 3-7"/>',
+  grain: '<path d="M12 21V9"/><path d="M12 9c-3-.5-4.5-2.5-4.5-5 3 0 4.5 2 4.5 5zm0 0c3-.5 4.5-2.5 4.5-5-3 0-4.5 2-4.5 5zM12 15c-3-.5-4.5-2.5-4.5-5 3 0 4.5 2 4.5 5zm0 0c3-.5 4.5-2.5 4.5-5-3 0-4.5 2-4.5 5z"/>',
+  leaf: '<path d="M5 19C5 10 11 5 19 5c0 8-5 14-14 14zM5 19l7-7"/>',
+  layers: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+  medal: '<circle cx="12" cy="9" r="5"/><path d="M9.5 13.5L8 21l4-2 4 2-1.5-7.5"/>',
+  drop: '<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',
+  flame: '<path d="M12 21c-4 0-6-3-6-6 0-4 4-6 4-11 3 2 8 6 8 11 0 3-2 6-6 6z"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  note: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7"/>',
+  percent: '<path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.3"/><circle cx="17" cy="17" r="2.3"/>',
+  yen: '<path d="M6 4l6 8 6-8M12 12v8M8 13.5h8M8 17h8"/>',
+  bottle: '<path d="M10 2h4v4c0 1 2 2 2 4v11H8V10c0-2 2-3 2-4z"/><path d="M8 13h8"/>',
+  tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/>',
+  comment: '<path d="M4 5h16v11H9l-5 4z"/>',
+  dot: '<circle cx="12" cy="12" r="3"/>',
+  up: '<path d="M6 14l6-6 6 6"/>',
+  vfull: '<rect x="4" y="4" width="16" height="7" rx="1.5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/>',
+  vcompact: '<path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>',
+};
+const icon = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ICONS.dot}</svg>`;
+const FIELD_IC = { type: 'layers', kind: 'layers', region: 'pin', country: 'pin', cru: 'pin', age: 'hourglass', vintage: 'calendar',
+  bottler: 'medal', bottlerName: 'factory', cask: 'barrel', peat: 'smoke', mashbill: 'grain', feat: 'star', base: 'grain', material: 'grain',
+  botanicals: 'leaf', agave: 'leaf', flavor: 'leaf', flavorMain: 'leaf', still: 'flame', cook: 'flame', grade: 'medal', nom: 'factory',
+  filter: 'drop', sweet: 'drop', memo: 'note' };
+const fieldIc = k => FIELD_IC[k] || 'dot';
+const RATE = { 3: { sym: '◎', label: 'イチオシ' }, 2: { sym: '○', label: 'おすすめ' }, 1: { sym: '△', label: 'いまいち' } };
+const VOLUMES = ['700', '750', '500', '1000', '200', '375'];
 const ICON_BACK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
 
 /* ---------- ユーティリティ ---------- */
 const app = document.getElementById('app');
+const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
@@ -217,7 +511,13 @@ const fmtDate = s => s ? s.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, '$1/$2/$3') : '';
 const norm = s => String(s || '').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
 const isNum = s => /^\d+(\.\d+)?$/.test(String(s).trim());
 const uniq = a => [...new Set(a)];
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fmtAbv = v => isNum(v) ? v + '%' : v;
+const byOpt = (o, sub) => !o ? undefined : (Array.isArray(o) || typeof o === 'string') ? o : (o[sub] ?? o._);
+const subLabel = (cat, sub) => (SC[cat].subs.find(s => s[0] === sub) || [, '未分類'])[1];
+const visibleFields = (cat, sub) => SC[cat].fields.filter(f => !f.showIf || f.showIf.includes(sub));
+const specVal = (n, k) => n.spec?.[k] ?? '';
+const hasVal = v => Array.isArray(v) ? v.length > 0 : String(v ?? '').trim() !== '';
+const fmtField = (f, v) => Array.isArray(v) ? v.join('・') : (f.fmt === 'age' && isNum(v) ? v + '年' : v);
 
 function toast(msg, ms = 2400) {
   document.querySelectorAll('.toast').forEach(t => t.remove());
@@ -226,7 +526,6 @@ function toast(msg, ms = 2400) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), ms);
 }
-
 function confirmDialog(message, okLabel = 'OK', danger = false) {
   return new Promise(resolve => {
     const o = document.createElement('div');
@@ -244,10 +543,11 @@ function confirmDialog(message, okLabel = 'OK', danger = false) {
 }
 
 /* ---------- IndexedDB ---------- */
+const DB_NAME = 'tasting-notes-v4';
 let db;
 function openDB() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open('tasting-notes', 1);
+    const r = indexedDB.open(DB_NAME, 1);
     r.onupgradeneeded = () => { r.result.createObjectStore('notes', { keyPath: 'id' }); r.result.createObjectStore('meta'); };
     r.onsuccess = () => res(r.result);
     r.onerror = () => rej(r.error);
@@ -275,66 +575,100 @@ const metaDel = k => tx('meta', 'readwrite', s => s.delete(k));
 
 /* ---------- 状態 ---------- */
 let notes = [];
-let customTags = [];       // ユーザーが追加したタグ
+let customTags = [];          // 自分で追加したタグ
+let customCocktails = {};     // 酒類ごとに自分で追加したカクテル
 let lastBackup = 0;
 let deferredInstall = null;
-const F = { q: '', cat: 'all', tags: [], sort: 'date-desc', tagPanel: false };
+const F = { cat: 'whisky', sub: 'all', q: '', tags: [], sort: 'date-desc', tagPanel: false, legend: false, view: 'full', dmode: 'serve' };
+let shotMl = 30;    // 1ショットの量(ml)。バックアップ画面の設定で変更可
+try { const v = JSON.parse(localStorage.getItem('tn-view') || '{}'); if (SC[v.cat]) F.cat = v.cat; if (v.sub) F.sub = v.sub; if (v.sort) F.sort = v.sort; if (v.view) F.view = v.view; if (v.dmode) F.dmode = v.dmode; } catch (_) {}
+const saveView = () => { try { localStorage.setItem('tn-view', JSON.stringify({ cat: F.cat, sub: F.sub, sort: F.sort, view: F.view, dmode: F.dmode })); } catch (_) {} };
 let listScroll = 0;
 let E = null, E0 = '', editKey = '', draftTimer = null, draftRestored = false;
 
+/* ---------- データの整形 ---------- */
 function cleanSession(o) {
-  return { id: String(o.id || uid()), serve: String(o.serve ?? ''), date: String(o.date ?? ''), place: String(o.place ?? ''), placeName: String(o.placeName ?? ''), comment: String(o.comment ?? '') };
+  return { id: String(o.id || uid()), serve: String(o.serve ?? ''), rating: RATE[o.rating] ? String(o.rating) : '', date: String(o.date ?? ''), place: String(o.place ?? ''), placeName: String(o.placeName ?? ''), comment: String(o.comment ?? '') };
 }
-function newSession(date = today()) { return cleanSession({ date }); }
-function normalizeNote(n) {
-  n.tags = Array.isArray(n.tags) ? n.tags : [];
-  if (Array.isArray(n.sessions)) n.sessions = n.sessions.map(cleanSession);
-  else {   // 旧形式(1ノート=1回の記録)を新形式に変換 (下書き復元用)
-    n.sessions = [cleanSession({ serve: n.serve, date: n.date, place: n.place, placeName: n.placeName, comment: n.overall })];
-    for (const k of ['serve', 'date', 'place', 'placeName', 'overall']) delete n[k];
-  }
-  return n;
+function cleanNote(o) {
+  if (!o || typeof o !== 'object' || !o.id || !o.name || !SC[o.cat]) return null;
+  const img = v => (typeof v === 'string' && v.startsWith('data:image/') ? v : '');
+  const spec = {};
+  if (o.spec && typeof o.spec === 'object') for (const [k, v] of Object.entries(o.spec)) spec[k] = Array.isArray(v) ? v.map(String) : String(v ?? '');
+  return {
+    id: String(o.id), cat: o.cat, sub: SC[o.cat].subs.some(s => s[0] === o.sub) ? o.sub : SC[o.cat].fallback,
+    name: String(o.name), producer: String(o.producer ?? ''), summary: String(o.summary ?? ''), abv: String(o.abv ?? ''), volume: String(o.volume ?? ''), price: String(o.price ?? ''), spec,
+    color: String(o.color ?? ''), nose: String(o.nose ?? ''), palate: String(o.palate ?? ''), finish: String(o.finish ?? ''),
+    tags: Array.isArray(o.tags) ? o.tags.map(String).filter(Boolean) : [],
+    sessions: Array.isArray(o.sessions) ? o.sessions.map(cleanSession) : [],
+    photo: img(o.photo), thumb: img(o.thumb),
+    createdAt: Number(o.createdAt) || Date.now(), updatedAt: Number(o.updatedAt) || Number(o.createdAt) || Date.now(),
+  };
 }
+
+/* ---------- 一覧用の計算 ---------- */
 const lastDate = n => n.sessions.reduce((m, s) => (s.date || '') > m ? s.date : m, '');
 const latestSessions = n => [...n.sessions].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-function sortedNotes() {
-  const a = [...notes];
+function sortNotes(a) {
   const byDate = (x, y) => lastDate(y).localeCompare(lastDate(x)) || y.createdAt - x.createdAt;
   switch (F.sort) {
-    case 'date-asc': a.sort((x, y) => -byDate(x, y)); break;
-    case 'name': a.sort((x, y) => x.name.localeCompare(y.name, 'ja')); break;
-    case 'updated': a.sort((x, y) => y.updatedAt - x.updatedAt); break;
-    default: a.sort(byDate);
+    case 'date-asc': return a.sort((x, y) => -byDate(x, y));
+    case 'name': return a.sort((x, y) => x.name.localeCompare(y.name, 'ja'));
+    case 'updated': return a.sort((x, y) => y.updatedAt - x.updatedAt);
+    default: return a.sort(byDate);
   }
-  return a;
 }
+function haystack(n) {
+  return norm([n.name, n.producer, n.summary, subLabel(n.cat, n.sub), n.color, n.nose, n.palate, n.finish, n.tags.join(' '),
+    ...Object.values(n.spec).flat(),
+    ...n.sessions.flatMap(s => [s.serve, s.place, s.placeName, s.comment])].join(' '));
+}
+function matchQ(n, words) { if (!words.length) return true; const h = haystack(n); return words.every(w => h.includes(w)); }
+const qWords = () => norm(F.q).split(/\s+/).filter(Boolean);
 function filteredNotes() {
-  const words = norm(F.q).split(/\s+/).filter(Boolean);
-  return sortedNotes().filter(n => {
-    if (F.cat !== 'all' && n.category !== F.cat) return false;
-    if (F.tags.length && !F.tags.every(t => n.tags.includes(t))) return false;
-    if (words.length) {
-      const hay = norm([n.name, n.brand, n.type, n.region, n.color, n.nose, n.palate, n.finish, n.tags.join(' '), ...n.sessions.flatMap(s => [s.serve, s.place, s.placeName, s.comment])].join(' '));
-      return words.every(w => hay.includes(w));
-    }
-    return true;
-  });
+  const words = qWords();
+  return sortNotes(notes.filter(n => n.cat === F.cat && (F.sub === 'all' || n.sub === F.sub) && F.tags.every(t => n.tags.includes(t)) && matchQ(n, words)));
 }
-function usedTags() {
-  const c = {};
-  notes.forEach(n => n.tags.forEach(t => { c[t] = (c[t] || 0) + 1; }));
-  return Object.entries(c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'));
+const toNum = v => parseFloat(String(v ?? '').replace(/[,，円¥]|ml/gi, ''));
+function shotPrice(n) { const p = toNum(n.price), v = toNum(n.volume); return p > 0 && v > 0 ? Math.round(p / v * shotMl) : null; }
+const yen = x => '¥' + Number(x).toLocaleString('ja-JP');
+const fmtPrice = v => isNum(String(v).replace(/,/g, '')) ? yen(String(v).replace(/,/g, '')) : v;
+const fmtVol = v => isNum(v) ? v + 'ml' : v;
+/* 飲み方ごとのおすすめ度をまとめる (同じ飲み方は最新の評価を採用) */
+function serveSummary(n) {
+  const m = new Map();
+  for (const s of latestSessions(n)) {
+    const k = s.serve.trim(); if (!k) continue;
+    if (!m.has(k)) m.set(k, s.rating); else if (!m.get(k) && s.rating) m.set(k, s.rating);
+  }
+  return [...m].map(([serve, rating]) => ({ serve, rating })).sort((a, b) => (+b.rating || 0) - (+a.rating || 0));
 }
-function metaLine(n) {
-  const p = [];
-  if (n.brand) p.push(n.brand);
-  if (n.type) p.push(n.type);
-  if (n.region) p.push(n.region);
-  if (n.abv) p.push(isNum(n.abv) ? n.abv + '%' : n.abv);
-  if (n.age) p.push(isNum(n.age) ? n.age + '年' : n.age);
-  return p.join(' ・ ');
+const servePill = x => `<span class="pill ${x.rating ? 'r' + x.rating : 'serve'}" title="${esc(x.rating ? RATE[x.rating].label : 'おすすめ度なし')}">${x.rating ? RATE[x.rating].sym + ' ' : ''}${esc(x.serve)}</span>`;
+function listLineHTML(n) {
+  const c = SC[n.cat], out = [];
+  const mi = (ic, title, text) => `<span class="mi" title="${esc(title)}">${icon(ic)}<span>${esc(text)}</span></span>`;
+  if (F.sub === 'all') out.push(`<span class="sublbl">${esc(subLabel(n.cat, n.sub))}</span>`);
+  if (n.producer && !norm(n.name).includes(norm(n.producer))) out.push(mi('factory', c.producer, n.producer));
+  for (const k of c.list) {
+    const f = c.fields.find(x => x.k === k);
+    if (!f || (f.showIf && !f.showIf.includes(n.sub))) continue;
+    const v = specVal(n, k);
+    if (hasVal(v)) out.push(mi(fieldIc(k), f.label, Array.isArray(v) ? v.slice(0, 3).join('・') + (v.length > 3 ? ' 他' : '') : fmtField(f, v)));
+  }
+  if (n.abv) out.push(mi('percent', '度数', fmtAbv(n.abv)));
+  if (n.volume) out.push(mi('bottle', '容量', fmtVol(n.volume)));
+  if (n.price) out.push(mi('yen', 'ボトル価格', fmtPrice(n.price)));
+  return out.join('');
 }
-function snippet(n) { const c = latestSessions(n).find(s => s.comment.trim()); return ((c && c.comment) || n.palate || n.nose || '').replace(/\s+/g, ' '); }
+function legendHTML() {
+  const c = SC[F.cat];
+  const lg = (ic, t) => `<span class="lg">${icon(ic)}${esc(t)}</span>`;
+  const items = [lg('factory', c.producer),
+    ...c.list.map(k => c.fields.find(f => f.k === k)).filter(Boolean).map(f => lg(fieldIc(f.k), f.label)),
+    lg('percent', '度数'), lg('bottle', '容量'), lg('yen', 'ボトル価格'), lg('comment', 'ひとこと'), lg('glass', '飲み方'), lg('tag', 'フレーバータグ'),
+    ...Object.entries(RATE).reverse().map(([r, x]) => `<span class="lg"><span class="pill r${r}">${x.sym}</span>${x.label}</span>`)];
+  return `<div class="legend" style="--c-cur:var(--c-${F.cat})">${items.join('')}</div>`;
+}
 
 /* ---------- ルーティング ---------- */
 function go(hash, replace) {
@@ -343,13 +677,12 @@ function go(hash, replace) {
   else location.hash = hash;
 }
 window.addEventListener('hashchange', route);
-
-async function route() {
-  const parts = (location.hash.slice(1) || '/').split('/').filter(Boolean);
-  const [a, b] = parts;
+function route() {
+  document.body.classList.remove('has-savebar');
+  const [a, b, c, d] = (location.hash.slice(1) || '/').split('/').filter(Boolean);
   if (a === 'n' && b) return renderDetail(b);
   if (a === 'new') return openEditor(null, false);
-  if (a === 'edit' && b) return openEditor(b, parts[2] === 'add');
+  if (a === 'edit' && b) return openEditor(b, c === 'add', d ? decodeURIComponent(d) : '');
   if (a === 'backup') return renderBackup();
   return renderList();
 }
@@ -357,78 +690,136 @@ async function route() {
 /* ============================================================
    一覧
    ============================================================ */
+const setTint = cat => document.documentElement.style.setProperty('--c-page', cat ? `var(--c-${cat})` : 'var(--bg)');
 function renderList() {
+  setTint(F.cat);
   document.title = 'テイスティングノート';
+  const c = SC[F.cat];
   const showNotice = notes.length > 0 && (!lastBackup || Date.now() - lastBackup > 30 * 86400e3);
   app.innerHTML = `
+  ${showNotice ? `<div class="notice" style="margin-top:12px"><span>${lastBackup ? '前回のバックアップから30日以上たっています。' : 'まだバックアップがありません。'}端末が故障するとデータが消えるため、定期的な書き出しをおすすめします。</span><button class="btn small" data-act="backup">開く</button></div>` : ''}
+  <div class="lhead" id="lhead">
   <header class="top">
-    <h1>${ICON_GLASS}テイスティングノート</h1>
+    <h1>${icon('glass')}<span class="ttl">テイスティングノート</span></h1>
     <div class="top-actions">
       <button class="btn ghost small" data-act="backup">バックアップ</button>
       <button class="btn primary" data-act="new">＋ 新規</button>
     </div>
   </header>
-  ${showNotice ? `<div class="notice"><span>${lastBackup ? '前回のバックアップから30日以上たっています。' : 'まだバックアップがありません。'}端末が故障するとデータが消えるため、定期的な書き出しをおすすめします。</span><button class="btn small" data-act="backup">開く</button></div>` : ''}
-  <div class="tools">
-    <input type="search" id="q" placeholder="銘柄・産地・香り・場所などで検索" value="${esc(F.q)}" enterkeyhint="search" autocomplete="off">
-    <div class="chips" id="catChips">
-      ${[['all', 'すべて'], ...Object.entries(CATS).filter(([k]) => k === F.cat || notes.some(n => n.category === k))].map(([k, v]) => `<button class="chip" data-act="cat" data-v="${k}" aria-pressed="${F.cat === k}">${v}</button>`).join('')}
-    </div>
-    <div class="row">
-      <select id="sort" aria-label="並べ替え">
-        ${[['date-desc', '最後に飲んだ日：新しい順'], ['date-asc', '最後に飲んだ日：古い順'], ['name', '銘柄名順'], ['updated', '更新日順']].map(([k, v]) => `<option value="${k}" ${F.sort === k ? 'selected' : ''}>${v}</option>`).join('')}
-      </select>
-      <button class="btn small" data-act="tagpanel" id="tagBtn"></button>
-    </div>
-    <div id="tagPanel" hidden></div>
+  <nav class="cat-tabs" role="tablist" aria-label="種類">
+    ${CATS.map(x => `<button class="cat-tab" role="tab" data-act="cat" data-v="${x.k}" aria-selected="${F.cat === x.k}" style="--c:var(--c-${x.k})"><span>${x.label}</span><small>${notes.filter(n => n.cat === x.k).length}</small></button>`).join('')}
+  </nav>
   </div>
-  <div id="results"></div>`;
+  <section class="sheet"><div class="layout" style="--c-cur:var(--c-${F.cat})">
+    <div class="subtabs" id="subtabs" role="tablist" aria-label="中分類"></div>
+    <main>
+      <div class="toolbar">
+        <input type="search" id="q" placeholder="${esc(c.label)}から検索" title="銘柄・香り・ひとこと・飲み方・場所などで検索できます" value="${esc(F.q)}" enterkeyhint="search" autocomplete="off">
+        <div class="row">
+          <select id="sort" aria-label="並べ替え">
+            ${[['date-desc', '最近飲んだ順'], ['date-asc', '古い順'], ['name', '銘柄名順'], ['updated', '更新順']].map(([k, v]) => `<option value="${k}" ${F.sort === k ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>
+          <button class="btn small" data-act="tagpanel" id="tagBtn"></button>
+          <span class="seg" role="group" aria-label="表示の切り替え">
+            <button type="button" data-act="view" data-v="full" aria-pressed="${F.view === 'full'}" title="詳細表示" aria-label="詳細表示">${icon('vfull')}</button>
+            <button type="button" data-act="view" data-v="compact" aria-pressed="${F.view === 'compact'}" title="コンパクト表示" aria-label="コンパクト表示">${icon('vcompact')}</button>
+          </span>
+        </div>
+        <div id="tagPanel" hidden></div>
+      </div>
+      <div id="results"></div>
+    </main>
+  </div></section>`;
   updateList();
   window.scrollTo(0, listScroll);
+  measureHead();
+}
+/* 固定見出しの高さを測って、検索欄・中分類タブの固定位置に使う */
+let headStuck = false;
+function measureHead() {
+  const h = $('#lhead');
+  if (!h) { headStuck = false; return; }
+  const prev = h.previousElementSibling;
+  const start = prev ? prev.offsetTop + prev.offsetHeight : 0;
+  const y = window.scrollY;
+  // 行ったり来たりしないよう、固定する位置と戻す位置に差をつける
+  if (!headStuck && y > start + 40) headStuck = true;
+  else if (headStuck && y < start + 4) headStuck = false;
+  h.classList.toggle('stuck', headStuck);
+  document.documentElement.style.setProperty('--head-h', h.offsetHeight + 'px');
 }
 
 function updateList() {
-  const list = filteredNotes();
+  const c = SC[F.cat];
+  const inCat = notes.filter(n => n.cat === F.cat);
+  const st = $('#subtabs');
+  if (st) st.innerHTML = [['all', 'すべて'], ...c.subs].map(([k, v]) => {
+    const cnt = k === 'all' ? inCat.length : inCat.filter(n => n.sub === k).length;
+    return `<button class="subtab" role="tab" data-act="sub" data-v="${k}" aria-selected="${F.sub === k}"><span>${esc(v)}</span><small>${cnt}</small></button>`;
+  }).join('');
   const tagBtn = $('#tagBtn');
-  if (tagBtn) tagBtn.textContent = 'タグ絞り込み' + (F.tags.length ? ` (${F.tags.length})` : '');
+  if (tagBtn) tagBtn.textContent = 'タグ' + (F.tags.length ? ` (${F.tags.length})` : '');
   const panel = $('#tagPanel');
   if (panel) {
     panel.hidden = !F.tagPanel;
     if (F.tagPanel) {
-      const used = usedTags();
+      const cnt = {};
+      inCat.forEach(n => n.tags.forEach(t => { cnt[t] = (cnt[t] || 0) + 1; }));
+      const used = Object.entries(cnt).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'));
       panel.innerHTML = used.length
-        ? `<div class="chips">${used.map(([t, c]) => `<button class="chip tag" data-act="ftag" data-v="${esc(t)}" aria-pressed="${F.tags.includes(t)}">${esc(t)} <small>${c}</small></button>`).join('')}</div>
+        ? `<div class="chips">${used.map(([t, n]) => `<button class="chip tag" data-act="ftag" data-v="${esc(t)}" aria-pressed="${F.tags.includes(t)}">${esc(t)} <small>${n}</small></button>`).join('')}</div>
            ${F.tags.length ? '<div style="margin-top:10px"><button class="btn small" data-act="cleartags">タグ選択をクリア</button></div>' : ''}`
-        : '<span class="muted">まだタグがありません</span>';
+        : `<span class="muted">${esc(c.label)}のノートにはまだタグがありません</span>`;
     }
   }
   const r = $('#results');
   if (!r) return;
-  if (!notes.length) {
-    r.innerHTML = `<div class="empty">${ICON_GLASS}<p>まだノートがありません。<br>最初の1杯を記録してみましょう。</p><button class="btn primary" data-act="new">＋ 新規ノート</button></div>`;
+  const list = filteredNotes();
+  const words = qWords();
+  // 検索語があるとき、他の種類のヒット件数も案内する
+  let others = '';
+  if (words.length) {
+    const hits = CATS.filter(x => x.k !== F.cat).map(x => [x, notes.filter(n => n.cat === x.k && matchQ(n, words)).length]).filter(([, k]) => k);
+    others = hits.map(([x, k]) => `<a data-act="cat" data-v="${x.k}" data-keepq="1">${esc(x.label)} ${k}件</a>`).join('');
+  }
+  const filtering = words.length || F.sub !== 'all' || F.tags.length;
+  const countLine = `<div class="count"><span>${filtering ? `${list.length}件 / ${esc(c.label)} 全${inCat.length}件` : `${inCat.length}件`}</span>${others ? `<span>他の種類：</span>${others}` : ''}<a data-act="legend">${F.legend ? 'アイコンの見方を閉じる' : 'アイコンの見方'}</a></div>${F.legend ? legendHTML() : ''}`;
+  if (!inCat.length) {
+    r.innerHTML = (others ? countLine : '') + `<div class="empty">${icon('glass')}<p>まだ${esc(c.label)}のノートがありません。</p><button class="btn primary" data-act="new">＋ ${esc(c.label)}のノートを追加</button></div>`;
     return;
   }
   if (!list.length) {
-    r.innerHTML = `<div class="empty"><p>条件に合うノートがありません。</p><button class="btn" data-act="clearfilters">絞り込みを解除</button></div>`;
+    r.innerHTML = countLine + `<div class="empty"><p>条件に合うノートがありません。</p><button class="btn" data-act="clearfilters">絞り込みを解除</button></div>`;
     return;
   }
-  const filtering = F.q || F.cat !== 'all' || F.tags.length;
-  r.innerHTML = `<div class="count">${filtering ? `${list.length}件 / 全${notes.length}件` : `${notes.length}件`}</div>
-  <div class="grid">${list.map(cardHTML).join('')}</div>`;
+  r.innerHTML = countLine + `<div class="list ${F.view === 'compact' ? 'compact' : ''}">${list.map(F.view === 'compact' ? compactHTML : itemHTML).join('')}</div>`;
 }
 
-function cardHTML(n) {
-  const serves = uniq(latestSessions(n).map(s => s.serve).filter(Boolean));
-  const servePills = serves.slice(0, 4).map(t => `<span class="servepill">${esc(t)}</span>`).join('') + (serves.length > 4 ? `<span class="servepill">+${serves.length - 4}</span>` : '');
-  const tags = n.tags.slice(0, 3).map(t => `<span class="tagpill">${esc(t)}</span>`).join('') + (n.tags.length > 3 ? `<span class="tagpill">+${n.tags.length - 3}</span>` : '');
-  return `<a class="card" href="#/n/${esc(n.id)}" data-act="open-note">
-    ${n.thumb ? `<img class="thumb" src="${esc(n.thumb)}" alt="" loading="lazy">` : `<div class="ph">${ICON_GLASS}</div>`}
-    <div class="card-body">
-      <div class="card-top"><span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span><time>${esc(fmtDate(lastDate(n)))}</time></div>
-      <h3>${esc(n.name)}</h3>
-      <p class="sub">${esc(metaLine(n)) || '&nbsp;'}</p>
-      ${servePills || tags ? `<div class="tags">${servePills}${tags}</div>` : ''}
-      ${snippet(n) ? `<p class="snip">${esc(snippet(n))}</p>` : ''}
+function compactHTML(n) {
+  const c = SC[n.cat], meta = [];
+  if (F.sub === 'all') meta.push(subLabel(n.cat, n.sub));
+  for (const k of c.list.slice(0, 2)) {
+    const f = c.fields.find(x => x.k === k); const v = specVal(n, k);
+    if (f && hasVal(v) && (!f.showIf || f.showIf.includes(n.sub))) meta.push(Array.isArray(v) ? v.slice(0, 2).join('・') : fmtField(f, v));
+  }
+  if (n.abv) meta.push(fmtAbv(n.abv));
+  const sum = serveSummary(n);
+  const best = (sum.some(x => x.rating === '3') ? sum.filter(x => x.rating === '3') : sum.filter(x => x.rating)).slice(0, 2);
+  return `<a class="citem" href="#/n/${esc(n.id)}" data-act="open-note">
+    <div class="c-main"><span class="c-name">${esc(n.name)}</span><span class="c-meta">${esc(meta.join(' ・ '))}</span></div>
+    <div class="c-side">${best.map(servePill).join('')}<time>${esc(fmtDate(lastDate(n)))}</time></div></a>`;
+}
+function itemHTML(n) {
+  const line = listLineHTML(n);
+  const serves = serveSummary(n).map(servePill).join('');
+  const tags = n.tags.slice(0, 5).map(t => `<span class="pill tag">${esc(t)}</span>`).join('') + (n.tags.length > 5 ? `<span class="pill tag">+${n.tags.length - 5}</span>` : '');
+  return `<a class="item" href="#/n/${esc(n.id)}" data-act="open-note">
+    ${n.thumb ? `<img class="thumb" src="${esc(n.thumb)}" alt="" loading="lazy">` : `<div class="ph">${icon('glass')}</div>`}
+    <div class="it-body">
+      <div class="it-top"><h3>${esc(n.name)}</h3><time>${esc(fmtDate(lastDate(n)))}</time></div>
+      ${line ? `<div class="it-line">${line}</div>` : ''}
+      ${n.summary.trim() ? `<div class="it-comment" title="ひとこと">${icon('comment')}<span>${esc(n.summary)}</span></div>` : ''}
+      ${serves || tags ? `<div class="it-pills">${serves ? `<div class="grp" title="飲み方">${icon('glass')}${serves}</div>` : ''}${tags ? `<div class="grp" title="フレーバータグ">${icon('tag')}${tags}</div>` : ''}</div>` : ''}
     </div></a>`;
 }
 
@@ -438,43 +829,63 @@ function cardHTML(n) {
 function renderDetail(id) {
   const n = notes.find(x => x.id === id);
   if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
+  const c = SC[n.cat];
+  setTint(n.cat);
   document.title = n.name + ' - テイスティングノート';
-  const kv = (k, v) => `<dt>${k}</dt><dd class="${v ? '' : 'empty-v'}">${v ? esc(v) : '―'}</dd>`;
+  const kvs = rows => rows.filter(r => hasVal(r[1])).map(([k, v, ic]) => `<dt>${ic ? icon(ic) : ''}<span>${esc(k)}</span></dt><dd>${esc(v)}</dd>`).join('');
+  const sp = shotPrice(n);
+  const basic = kvs([
+    ['度数', n.abv ? fmtAbv(n.abv) : '', 'percent'],
+    ['容量', n.volume ? fmtVol(n.volume) : '', 'bottle'],
+    ['価格', n.price ? fmtPrice(n.price) : '', 'yen'],
+    [`1ショット(${shotMl}ml)`, sp != null ? '約' + yen(sp) : '', 'yen'],
+    ...visibleFields(n.cat, n.sub).map(f => [f.label, fmtField(f, specVal(n, f.k)), fieldIc(f.k)]),
+  ]);
+  const taste = kvs(TASTE.map(([k, l]) => [l.replace(/\(.*\)/, ''), n[k]]));
+  const sum = serveSummary(n);
   const sess = latestSessions(n);
+  // 飲み方ごとにまとめる (最新のおすすめ度 → 最後に飲んだ日 の順)
+  const groups = new Map();
+  for (const s of sess) { const k = s.serve.trim() || '(飲み方未設定)'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(s); }
+  const grpList = [...groups].map(([serve, list]) => ({ serve, list, rating: (list.find(x => x.rating) || {}).rating || '', last: list[0] }))
+    .sort((a, b) => (+b.rating || 0) - (+a.rating || 0) || (b.last.date || '').localeCompare(a.last.date || ''));
+  const oneSess = s => { const when = [fmtDate(s.date), [s.place, s.placeName].filter(Boolean).join(' / ')].filter(Boolean).join(' ・ ');
+    return `<div class="sess-view"><h3>${s.rating ? `<span class="rate r${s.rating}" title="${RATE[s.rating].label}">${RATE[s.rating].sym}</span>` : ''}<span class="when">${esc(when || '日付なし')}</span></h3>${s.comment.trim() ? `<p>${esc(s.comment)}</p>` : ''}</div>`; };
+  const grpHTML = grpList.map(g => {
+    const lastComment = (g.list.find(x => x.comment.trim()) || {}).comment || '';
+    return `<details class="sgrp"><summary>
+      <span class="rate ${g.rating ? 'r' + g.rating : 'r0'}" title="${g.rating ? RATE[g.rating].label : 'おすすめ度なし'}">${g.rating ? RATE[g.rating].sym : '−'}</span>
+      <span class="g-top"><b>${esc(g.serve)}</b><span class="g-meta">${g.list.length}回${g.last.date ? ' ・ 最終 ' + esc(fmtDate(g.last.date)) : ''}</span></span>
+      <span class="chev" aria-hidden="true"></span>
+      <span class="g-last">${esc(lastComment.replace(/\s+/g, ' ')) || '&nbsp;'}</span></summary>
+      <div class="g-body">${g.list.map(oneSess).join('')}
+        ${g.serve !== '(飲み方未設定)' ? `<button class="btn small" data-act="add-serve" data-id="${esc(n.id)}" data-serve="${esc(g.serve)}">＋ ${esc(g.serve)}で記録を追加</button>` : ''}</div></details>`;
+  }).join('');
   const sessHTML = sess.length ? sess.map(s => {
-    const where = [s.place, s.placeName].filter(Boolean).join(' / ');
-    const when = [fmtDate(s.date), where].filter(Boolean).join(' ・ ');
-    return `<div class="sess-view"><h3>${esc(s.serve || '(飲み方未設定)')}<span class="when">${esc(when)}</span></h3>
-      ${s.comment.trim() ? `<p>${esc(s.comment)}</p>` : '<p class="muted">コメントなし</p>'}</div>`;
+    const when = [fmtDate(s.date), [s.place, s.placeName].filter(Boolean).join(' / ')].filter(Boolean).join(' ・ ');
+    return `<div class="sess-view"><h3>${s.rating ? `<span class="rate r${s.rating}" title="${RATE[s.rating].label}">${RATE[s.rating].sym}</span>` : ''}${esc(s.serve || '(飲み方未設定)')}<span class="when">${esc(when)}</span></h3>
+      ${s.comment.trim() ? `<p>${esc(s.comment)}</p>` : ''}</div>`;
   }).join('') : '<p class="muted">まだ記録がありません</p>';
-  app.innerHTML = `
+  app.innerHTML = `<div class="narrow" style="--c-cur:var(--c-${n.cat})">
   <header class="top">
-    <button class="back" data-act="back-list">${ICON_BACK}一覧</button>
+    <button class="back" data-act="back-list">${ICON_BACK}${esc(c.label)}</button>
     <div class="top-actions"><button class="btn small" data-act="edit" data-id="${esc(n.id)}">編集</button></div>
   </header>
   ${n.photo ? `<img class="detail-photo" src="${esc(n.photo)}" alt="">` : ''}
-  <span class="badge ${esc(n.category)}">${esc(CATS[n.category] || 'その他')}</span>
+  <div><span class="badge">${esc(c.label)}</span><span class="badge-sub">${esc(subLabel(n.cat, n.sub))}</span></div>
   <h2 class="d-title">${esc(n.name)}</h2>
-  <p class="d-meta">${[n.brand, n.type, n.region].filter(Boolean).map(esc).join(' ・ ')}</p>
-  ${n.tags.length ? `<div class="tags" style="margin:6px 0 4px">${n.tags.map(t => `<span class="tagpill">${esc(t)}</span>`).join('')}</div>` : ''}
+  ${n.producer ? `<p class="d-line d-producer">${icon('factory')}<span>${esc(c.producer)}：${esc(n.producer)}</span></p>` : ''}
+  ${n.summary.trim() ? `<p class="d-line d-summary">${icon('comment')}<span>${esc(n.summary)}</span></p>` : ''}
+  ${n.tags.length ? `<div class="grp" style="margin:6px 0 4px">${icon('tag')}${n.tags.map(t => `<span class="pill tag">${esc(t)}</span>`).join('')}</div>` : ''}
 
-  <div class="section"><h2>基本情報</h2><dl class="kv">
-    ${kv('度数', n.abv ? (isNum(n.abv) ? n.abv + '%' : n.abv) : '')}
-    ${kv('熟成年数', n.age ? (isNum(n.age) ? n.age + '年' : n.age) : '')}
-    ${kv('価格', n.price ? '¥' + (isNum(n.price) ? Number(n.price).toLocaleString('ja-JP') : n.price) : '')}
-  </dl></div>
-
-  <div class="section"><h2>テイスティング</h2><dl class="kv">
-    ${kv('色', n.color)}${kv('香り', n.nose)}${kv('味わい', n.palate)}${kv('余韻', n.finish)}
-  </dl></div>
-
-  <div class="section"><h2>飲み方ごとの記録（${n.sessions.length}）</h2>
-    ${sessHTML}
+  ${basic ? `<div class="section"><h2>銘柄の情報</h2><dl class="kv">${basic}</dl></div>` : ''}
+  <div class="section"><h2>テイスティング</h2>${taste ? `<dl class="kv">${taste}</dl>` : '<p class="muted">まだ記録がありません</p>'}</div>
+  <div class="section"><div class="sec-head"><h2>飲み方ごとの記録（${n.sessions.length}）</h2>
+      ${sess.length ? `<span class="seg" role="group" aria-label="記録の表示"><button type="button" data-act="dmode" data-v="serve" data-id="${esc(n.id)}" aria-pressed="${F.dmode !== 'date'}">飲み方ごと</button><button type="button" data-act="dmode" data-v="date" data-id="${esc(n.id)}" aria-pressed="${F.dmode === 'date'}">日付順</button></span>` : ''}</div>
+    ${F.dmode === 'date' ? `${sum.length ? `<div class="grp serve-sum">${icon('glass')}${sum.map(servePill).join('')}</div>` : ''}${sessHTML}` : (sess.length ? grpHTML : sessHTML)}
     <div style="margin-top:12px"><button class="btn block" data-act="add-session" data-id="${esc(n.id)}">＋ 飲み方の記録を追加</button></div>
   </div>
-
-  <div class="actions">
-    <button class="btn danger" data-act="del" data-id="${esc(n.id)}">この銘柄のノートを削除</button>
+  <div class="actions"><button class="btn danger" data-act="del" data-id="${esc(n.id)}">この銘柄のノートを削除</button></div>
   </div>`;
   window.scrollTo(0, 0);
 }
@@ -482,15 +893,12 @@ function renderDetail(id) {
 /* ============================================================
    編集
    ============================================================ */
+function newSession(prev) { return cleanSession({ date: prev?.date || today(), place: prev?.place, placeName: prev?.placeName }); }
 function blankNote() {
-  return { id: uid(), createdAt: Date.now(), updatedAt: Date.now(), category: 'whisky', name: '', brand: '', type: '', region: '', abv: '', age: '', price: '', color: '', nose: '', palate: '', finish: '', tags: [], photo: '', thumb: '', sessions: [newSession()] };
+  return { id: uid(), createdAt: Date.now(), updatedAt: Date.now(), cat: F.cat, sub: F.sub === 'all' ? '' : F.sub, name: '', producer: '', summary: '', abv: '', volume: '', price: '', spec: {},
+    color: '', nose: '', palate: '', finish: '', tags: [], sessions: [newSession()], photo: '', thumb: '' };
 }
-function appendSession() {
-  const last = E.sessions[E.sessions.length - 1];
-  E.sessions.push(cleanSession({ date: last?.date || today(), place: last?.place, placeName: last?.placeName }));
-}
-
-async function openEditor(id, addSess) {
+async function openEditor(id, addSess, serve = '') {
   editKey = 'draft:' + (id || 'new');
   let base;
   if (id) {
@@ -498,109 +906,140 @@ async function openEditor(id, addSess) {
     if (!n) { toast('ノートが見つかりません'); return go('#/', true); }
     base = structuredClone(n);
   } else base = blankNote();
-  E = base;
-  E0 = JSON.stringify(base);
-  draftRestored = false;
+  E = base; E0 = JSON.stringify(base); draftRestored = false;
   try {
     const d = await metaGet(editKey);
-    if (d && d.data) { E = normalizeNote(d.data); draftRestored = true; }
-  } catch (_) { /* 下書きは無くても動く */ }
-  if (addSess && !draftRestored) { appendSession(); E0 = JSON.stringify(E); }
-  renderEditor(!!id);
-  if (addSess && !draftRestored) { const els = document.querySelectorAll('#sessions .sess'); els[els.length - 1]?.scrollIntoView({ block: 'center' }); }
+    if (d && d.data && SC[d.data.cat]) { E = d.data; draftRestored = true; }
+  } catch (_) {}
+  // 詳細画面から追加するときは今日の日付。場所は最後に飲んだ記録から引き継ぐ
+  if (addSess && !draftRestored) { const latest = latestSessions(E)[0]; E.sessions.push(cleanSession({ date: today(), place: latest?.place, placeName: latest?.placeName, serve })); E0 = JSON.stringify(E); }
+  renderEditor();
+  if (addSess && !draftRestored) document.querySelectorAll('#sessions .sess')[E.sessions.length - 1]?.scrollIntoView({ block: 'center' });
 }
+const isEditing = () => notes.some(n => n.id === E.id);
 
-function tagUniverse() {
-  return uniq([...customTags, ...notes.flatMap(n => n.tags), ...(E ? E.tags : [])]).filter(t => !PRESET_TAGS.has(t));
+function optList(vals) { return uniq(vals.filter(Boolean)).map(v => `<option value="${esc(v)}">`).join(''); }
+
+function specFieldHTML(f) {
+  const cls = f.w ? ` w${f.w}` : '';
+  const v = E.spec[f.k] ?? (f.type === 'many' ? [] : '');
+  const ph = esc(byOpt(f.ph, E.sub) || '');
+  if (f.type === 'text') return `<div class="field${cls}"><label for="s-${f.k}">${esc(f.label)}</label><input type="text" id="s-${f.k}" data-spec="${f.k}" value="${esc(v)}" placeholder="${ph}" autocomplete="off"></div>`;
+  const opts = byOpt(f.opts, E.sub) || [];
+  if (f.type === 'one') {
+    const chips = uniq([...opts, ...(f.free ? [] : [v])]).filter(Boolean);
+    return `<div class="field${cls}"><span class="lbl">${esc(f.label)}</span>
+      ${chips.length ? `<div class="chips">${chips.map(o => `<button type="button" class="chip" data-act="spec-one" data-k="${f.k}" data-v="${esc(o)}" aria-pressed="${v === o}">${esc(o)}</button>`).join('')}</div>` : ''}
+      ${f.free ? `<input type="text" data-spec="${f.k}" value="${esc(v)}" placeholder="${ph || (chips.length ? '選択肢に無ければ入力' : '')}" aria-label="${esc(f.label)}" autocomplete="off">` : ''}</div>`;
+  }
+  const arr = Array.isArray(v) ? v : [];
+  const chips = uniq([...opts, ...arr]);
+  return `<div class="field${cls}"><span class="lbl">${esc(f.label)}${f.type === 'many' ? '<small class="muted">（複数可）</small>' : ''}</span>
+    <div class="chips">${chips.map(o => `<button type="button" class="chip" data-act="spec-many" data-k="${f.k}" data-v="${esc(o)}" aria-pressed="${arr.includes(o)}">${esc(o)}</button>`).join('')}</div>
+    ${f.free ? `<div class="add-row"><input type="text" data-many-input="${f.k}" placeholder="追加する" aria-label="${esc(f.label)}を追加" autocomplete="off" enterkeyhint="done"><button type="button" class="btn small" data-act="spec-many-add" data-k="${f.k}">追加</button></div>` : ''}</div>`;
+}
+function specBlockHTML() {
+  if (!E.sub) return '<p class="muted" style="margin:0">中分類を選ぶと、専用の入力項目が表示されます。</p>';
+  return `<div class="fgrid">${visibleFields(E.cat, E.sub).map(specFieldHTML).join('')}</div>`;
 }
 function tagPickerHTML() {
-  const groups = TAG_GROUPS.filter(g => !g.only || g.only.includes(E.category));
-  const custom = tagUniverse();
+  const groups = [...SC[E.cat].tags, ...BASE_TAGS];
+  const shown = new Set(groups.flatMap(g => g.t));
+  const custom = uniq([...customTags, ...notes.filter(n => n.cat === E.cat).flatMap(n => n.tags), ...E.tags]).filter(t => !shown.has(t));
   const chip = t => `<button type="button" class="chip tag" data-act="ed-tag" data-v="${esc(t)}" aria-pressed="${E.tags.includes(t)}">${esc(t)}</button>`;
   return groups.map(g => `<div class="tag-group"><h3>${esc(g.g)}</h3><div class="chips">${g.t.map(chip).join('')}</div></div>`).join('')
     + (custom.length ? `<div class="tag-group"><h3>自分で追加したタグ</h3><div class="chips">${custom.map(chip).join('')}</div></div>` : '')
-    + `<div class="add-tag"><input type="text" id="newTag" placeholder="タグを追加（例：桜餅、白檀）" maxlength="20" enterkeyhint="done"><button type="button" class="btn" data-act="ed-addtag">追加</button></div>`;
+    + `<div class="add-row"><input type="text" id="newTag" placeholder="タグを追加（例：桜餅、白檀）" maxlength="20" enterkeyhint="done" autocomplete="off"><button type="button" class="btn small" data-act="ed-addtag">追加</button></div>`;
 }
-function optList(vals) { return uniq(vals.filter(Boolean)).map(v => `<option value="${esc(v)}">`).join(''); }
-function typeOptionsHTML() { return optList([...(TYPE_SUGGEST[E.category] || []), ...notes.filter(n => n.category === E.category).map(n => n.type)]); }
-
 function sessionHTML(s, i) {
-  const chips = (field, values) => `<div class="chips">${values.map(v => `<button type="button" class="chip" data-act="sess-chip" data-si="${i}" data-f="${field}" data-v="${esc(v)}" aria-pressed="${s[field] === v}">${esc(v)}</button>`).join('')}</div>`;
-  return `<div class="sess" data-i="${i}">
-    <div class="sess-head"><span>飲み方 ${i + 1}${s.serve ? '：' + esc(s.serve) : ''}</span>${E.sessions.length > 1 ? `<button type="button" class="btn small danger" data-act="sess-del" data-si="${i}">削除</button>` : ''}</div>
-    <div class="field"><span class="lbl">飲み方</span>${chips('serve', SERVES)}
-      <input type="text" data-si="${i}" data-sf="serve" value="${esc(s.serve)}" list="dl-serve" aria-label="飲み方（自由入力）" placeholder="自由入力もできます（例：ハイボール 1:3）" style="margin-top:8px" autocomplete="off"></div>
-    <div class="field"><span class="lbl">コメント</span><textarea data-si="${i}" data-sf="comment" rows="3" aria-label="コメント" placeholder="この飲み方での印象・気づき">${esc(s.comment)}</textarea></div>
+  const c = SC[E.cat];
+  const btn = (field, v, label) => `<button type="button" class="chip" data-act="sess-chip" data-si="${i}" data-f="${field}" data-v="${esc(v)}" aria-pressed="${s[field] === v}">${esc(label ?? v)}</button>`;
+  const groups = [['飲み方', c.serves]];
+  if (c.cocktails) groups.push(['カクテル', uniq([...c.cocktails, ...(customCocktails[E.cat] || [])])]);
+  const preset = new Set(groups.flatMap(g => g[1]));
+  const past = uniq(notes.filter(n => n.cat === E.cat).flatMap(n => n.sessions.map(x => x.serve.trim()))).filter(v => v && !preset.has(v)).slice(0, 10);
+  if (past.length) groups.push(['これまでの記録から', past]);
+  // 記録が多いときは、最後の記録以外を折りたたんで表示する
+  const open = E.sessions.length <= 3 || i === E.sessions.length - 1 || !(s.serve.trim() || s.comment.trim());
+  return `<details class="sess" data-i="${i}" ${open ? 'open' : ''}>
+    <summary class="sess-head"><span>${esc(sessTitle(s, i))}</span>${E.sessions.length > 1 ? `<button type="button" class="btn small danger" data-act="sess-del" data-si="${i}">削除</button>` : ''}</summary>
+    <div class="field"><span class="lbl">飲み方・カクテル</span>
+      ${groups.map(([l, vs]) => `${groups.length > 1 ? `<div class="chip-grp-lbl">${esc(l)}</div>` : ''}<div class="chips">${vs.map(v => btn('serve', v)).join('')}</div>`).join('')}
+      <input type="text" data-si="${i}" data-sf="serve" value="${esc(s.serve)}" list="dl-serve" aria-label="飲み方（自由入力）" placeholder="自由入力もできます（例：ハイボール 1:3、ジン・バック）" autocomplete="off"></div>
+    <div class="field"><span class="lbl">おすすめ度</span>
+      <div class="chips">${Object.entries(RATE).reverse().map(([r, x]) => btn('rating', r, `${x.sym} ${x.label}`)).join('')}</div></div>
+    <div class="field"><span class="lbl">コメント</span><textarea data-si="${i}" data-sf="comment" rows="3" aria-label="コメント" placeholder="この飲み方での印象・配合など">${esc(s.comment)}</textarea></div>
     <div class="field"><span class="lbl">日付</span><input type="date" data-si="${i}" data-sf="date" value="${esc(s.date)}" aria-label="日付"></div>
-    <div class="field"><span class="lbl">場所</span>${chips('place', PLACES)}
-      <input type="text" data-si="${i}" data-sf="placeName" value="${esc(s.placeName)}" list="dl-place" aria-label="店名・場所のメモ" placeholder="店名・場所のメモ" style="margin-top:8px" autocomplete="off"></div>
-  </div>`;
+    <div class="field"><span class="lbl">場所</span><div class="chips">${PLACES.map(v => btn('place', v)).join('')}</div>
+      <input type="text" data-si="${i}" data-sf="placeName" value="${esc(s.placeName)}" list="dl-place" aria-label="店名・場所のメモ" placeholder="店名・場所のメモ" autocomplete="off"></div>
+  </details>`;
 }
+const sessTitle = (s, i) => `飲み方 ${i + 1}${s.serve ? '：' + s.serve : ''}${s.rating ? ' ' + RATE[s.rating].sym : ''}${s.date ? '（' + fmtDate(s.date) + '）' : ''}`;
 function renderSessions() { $('#sessions').innerHTML = E.sessions.map(sessionHTML).join(''); }
 function syncSession(i) {
   const s = E.sessions[i], el = document.querySelector(`.sess[data-i="${i}"]`);
   if (!el) return;
   el.querySelectorAll('[data-act="sess-chip"]').forEach(c => c.setAttribute('aria-pressed', String(s[c.dataset.f] === c.dataset.v)));
   const inp = el.querySelector('[data-sf="serve"]'); if (inp && inp !== document.activeElement) inp.value = s.serve;
-  const pl = el.querySelector('[data-sf="placeName"]');
-  const head = el.querySelector('.sess-head span'); if (head) head.textContent = `飲み方 ${i + 1}${s.serve ? '：' + s.serve : ''}`;
+  const head = el.querySelector('.sess-head span'); if (head) head.textContent = sessTitle(s, i);
 }
 function updateDupHint() {
   const el = $('#dupHint');
-  if (!el || notes.some(n => n.id === E.id)) return;
+  if (!el || isEditing()) return;
   const k = norm(E.name).trim();
-  const m = k && notes.find(n => norm(n.name) === k);
+  const m = k && notes.find(n => n.cat === E.cat && norm(n.name) === k);
   el.innerHTML = m ? `<span>この銘柄はすでに登録されています。</span><button type="button" class="btn small" data-act="dup-open" data-id="${esc(m.id)}">飲み方の記録を追加する</button>` : '';
 }
+function photoBoxHTML() {
+  return (E.thumb ? `<img src="${esc(E.thumb)}" alt="添付写真">` : '')
+    + `<div class="row"><button type="button" class="btn small" data-act="ed-photo">${E.thumb ? '写真を変更' : '写真を追加'}</button>`
+    + (E.thumb ? `<button type="button" class="btn small danger" data-act="ed-photo-rm">削除</button>` : '') + `</div>`;
+}
 
-function renderEditor(isEdit) {
-  document.title = (isEdit ? 'ノートを編集' : '新しいノート') + ' - テイスティングノート';
-  const inp = (name, label, extra = '') => `<div class="field"><label for="f-${name}">${label}</label><input type="text" id="f-${name}" name="${name}" value="${esc(E[name])}" ${extra}></div>`;
+function renderEditor() {
+  const c = SC[E.cat], editing = isEditing();
+  setTint(E.cat);
+  document.title = (editing ? 'ノートを編集' : '新しいノート') + ' - テイスティングノート';
   const ta = (name, label, ph) => `<div class="field"><label for="f-${name}">${label}</label><textarea id="f-${name}" name="${name}" rows="3" placeholder="${esc(ph)}">${esc(E[name])}</textarea></div>`;
-  app.innerHTML = `
-  <div id="editor">
+  app.innerHTML = `<div class="narrow" id="editor" style="--c-cur:var(--c-${E.cat})">
   <header class="top">
-    <button class="back" data-act="ed-cancel">${ICON_BACK}${isEdit ? '編集をやめる' : 'キャンセル'}</button>
-    <h1 style="font-size:17px">${isEdit ? 'ノートを編集' : '新しいノート'}</h1>
+    <button class="back" data-act="ed-cancel">${ICON_BACK}${editing ? '編集をやめる' : 'キャンセル'}</button>
+    <h1 style="font-size:17px">${editing ? 'ノートを編集' : '新しいノート'}</h1>
   </header>
   ${draftRestored ? `<div class="notice"><span>前回の未保存の下書きを復元しました。</span><button class="btn small" data-act="ed-discard">下書きを破棄</button></div>` : ''}
 
+  <div class="section"><h2>種類</h2>
+    <div class="cat-pick">${CATS.map(x => `<button type="button" class="chip" data-act="ed-cat" data-v="${x.k}" aria-pressed="${E.cat === x.k}" style="--c:var(--c-${x.k})">${x.label}</button>`).join('')}</div>
+    <div class="field" style="margin:14px 0 0"><span class="lbl">中分類 <span class="req">*</span></span>
+      <div class="chips" id="subPick">${c.subs.map(([k, v]) => `<button type="button" class="chip" data-act="ed-sub" data-v="${k}" aria-pressed="${E.sub === k}">${esc(v)}</button>`).join('')}</div></div>
+  </div>
+
   <div class="section"><h2>基本情報</h2>
-    <div class="field"><span class="lbl">種類</span>
-      <div class="chips">${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-act="ed-chip" data-f="category" data-v="${k}" data-req="1" aria-pressed="${E.category === k}">${v}</button>`).join('')}</div></div>
-    ${inp('name', '銘柄名 <span style="color:var(--danger)">*</span>', 'autocomplete="off" placeholder="例：山崎 12年 / ボンベイ・サファイア"')}
-    <div id="dupHint" class="dup-hint"></div>
-    <div class="two">
-      ${inp('brand', '蒸留所・ブランド', 'list="dl-brand" autocomplete="off"')}
-      ${inp('region', '産地', 'list="dl-region" autocomplete="off" placeholder="例：スペイサイド"')}
+    <div class="fgrid">
+      <div class="field"><label for="f-name">銘柄名 <span class="req">*</span></label><input type="text" id="f-name" name="name" value="${esc(E.name)}" autocomplete="off" placeholder="例：${E.cat === 'gin' ? '季の美' : E.cat === 'whisky' ? 'グレンファークラス 15年' : '銘柄名'}"></div>
+      <div id="dupHint" class="dup-hint" style="grid-column:span 6"></div>
+      <div class="field"><label for="f-producer">${esc(c.producer)}</label><input type="text" id="f-producer" name="producer" value="${esc(E.producer)}" list="dl-producer" autocomplete="off"></div>
+      <div class="field"><label for="f-summary">ひとことコメント <small class="muted">（一覧に表示）</small></label><input type="text" id="f-summary" name="summary" value="${esc(E.summary)}" maxlength="80" autocomplete="off" placeholder="例：シェリー感たっぷり、食後の1杯に"></div>
+      <div class="field w2"><label for="f-abv">度数(%)</label><input type="text" id="f-abv" name="abv" value="${esc(E.abv)}" inputmode="decimal" placeholder="43"></div>
+      <div class="field w2"><label for="f-volume">容量(ml)</label><input type="text" id="f-volume" name="volume" value="${esc(E.volume)}" inputmode="numeric" list="dl-vol" placeholder="700" autocomplete="off"></div>
+      <div class="field w2"><label for="f-price">価格(円)</label><input type="text" id="f-price" name="price" value="${esc(E.price)}" inputmode="numeric" placeholder="ボトル価格"></div>
+      <div class="shot-calc" id="shotCalc"></div>
     </div>
-    ${inp('type', 'タイプ', 'list="dl-type" autocomplete="off" placeholder="例：シングルモルト / ロンドンドライ"')}
-    <div class="three">
-      <div class="field"><label for="f-abv">度数(%)</label><input type="text" id="f-abv" name="abv" value="${esc(E.abv)}" inputmode="decimal" placeholder="43"></div>
-      <div class="field"><label for="f-age">熟成年数</label><input type="text" id="f-age" name="age" value="${esc(E.age)}" placeholder="12 / NAS"></div>
-      <div class="field"><label for="f-price">価格(円)</label><input type="text" id="f-price" name="price" value="${esc(E.price)}" inputmode="numeric" placeholder="ボトル価格"></div>
-    </div>
-    <datalist id="dl-brand">${optList(notes.map(n => n.brand))}</datalist>
-    <datalist id="dl-region">${optList(notes.map(n => n.region))}</datalist>
-    <datalist id="dl-type">${typeOptionsHTML()}</datalist>
+    <datalist id="dl-vol">${VOLUMES.map(v => `<option value="${v}">`).join('')}</datalist>
+    <datalist id="dl-producer">${optList(notes.filter(n => n.cat === E.cat).map(n => n.producer))}</datalist>
   </div>
 
-  <div class="section"><h2>テイスティング（銘柄共通）</h2>
-    ${ta('color', '色', '例：深みのある琥珀色、無色透明')}
-    ${ta('nose', '香り(ノーズ)', '')}
-    ${ta('palate', '味わい(パレット)', '')}
-    ${ta('finish', '余韻(フィニッシュ)', '')}
-  </div>
+  <div class="section"><h2>${esc(c.label)}の詳細</h2><div id="specBlock">${specBlockHTML()}</div></div>
 
-  <div class="section"><h2>フレーバータグ</h2>
-    <div id="tagPicker">${tagPickerHTML()}</div>
-  </div>
+  <div class="section"><h2>テイスティング</h2>${TASTE.map(([k, l, ph]) => ta(k, l, ph)).join('')}</div>
+
+  <div class="section"><h2>フレーバータグ</h2><div id="tagPicker">${tagPickerHTML()}</div></div>
 
   <div class="section"><h2>飲み方ごとの記録</h2>
-    <p class="muted" style="margin-top:0">ロック・ハイボールなど、飲み方ごとにコメントと日付・場所を残せます。</p>
+    <p class="muted" style="margin-top:0">ストレート・ハイボール・カクテルなど、飲み方ごとにおすすめ度（◎○△）とコメントを残せます。</p>
     <div id="sessions">${E.sessions.map(sessionHTML).join('')}</div>
     <button type="button" class="btn block" data-act="ed-add-sess">＋ 飲み方を追加</button>
-    <datalist id="dl-serve">${optList([...SERVES, ...notes.flatMap(n => n.sessions.map(s => s.serve))])}</datalist>
+    <datalist id="dl-serve">${optList([...c.serves, ...(c.cocktails || []), ...notes.flatMap(n => n.sessions.map(s => s.serve))])}</datalist>
     <datalist id="dl-place">${optList(notes.flatMap(n => n.sessions.map(s => s.placeName)))}</datalist>
   </div>
 
@@ -615,24 +1054,21 @@ function renderEditor(isEdit) {
   </div>
   </div>`;
   updateDupHint();
+  updateShotCalc();
+  document.body.classList.add('has-savebar');
   window.scrollTo(0, 0);
 }
-function photoBoxHTML() {
-  return (E.thumb ? `<img src="${esc(E.thumb)}" alt="添付写真">` : '')
-    + `<div class="row"><button type="button" class="btn small" data-act="ed-photo">${E.thumb ? '写真を変更' : '写真を追加'}</button>`
-    + (E.thumb ? `<button type="button" class="btn small danger" data-act="ed-photo-rm">削除</button>` : '') + `</div>`;
+function updateShotCalc() {
+  const el = $('#shotCalc'); if (!el) return;
+  const sp = shotPrice(E);
+  el.textContent = sp != null ? `1ショット(${shotMl}ml)あたり 約${yen(sp)}` : '';
 }
 
 function scheduleDraft() {
   clearTimeout(draftTimer);
-  draftTimer = setTimeout(() => {
-    if (E && JSON.stringify(E) !== E0) metaSet(editKey, { data: E, at: Date.now() }).catch(() => {});
-  }, 500);
+  draftTimer = setTimeout(() => { if (E && JSON.stringify(E) !== E0) metaSet(editKey, { data: E, at: Date.now() }).catch(() => {}); }, 500);
 }
-async function clearDraft() {
-  clearTimeout(draftTimer);
-  try { await metaDel(editKey); } catch (_) {}
-}
+async function clearDraft() { clearTimeout(draftTimer); try { await metaDel(editKey); } catch (_) {} }
 
 function processPhoto(file) {
   return new Promise((res, rej) => {
@@ -646,7 +1082,7 @@ function processPhoto(file) {
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         return c.toDataURL('image/jpeg', q);
       };
-      const out = { photo: mk(1280, 0.82), thumb: mk(320, 0.75) };
+      const out = { photo: mk(1280, 0.82), thumb: mk(240, 0.75) };
       URL.revokeObjectURL(url); res(out);
     };
     img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('画像を読み込めませんでした')); };
@@ -655,20 +1091,23 @@ function processPhoto(file) {
 }
 
 async function saveNote() {
+  if (!E.sub) { toast('中分類を選んでください'); $('#subPick')?.scrollIntoView({ block: 'center' }); return; }
   if (!E.name.trim()) { toast('銘柄名を入力してください'); $('#f-name')?.focus(); return; }
   E.name = E.name.trim();
-  const kept = E.sessions.filter(s => s.serve.trim() || s.comment.trim() || s.place || s.placeName.trim());
-  E.sessions = kept.length ? kept : E.sessions.slice(0, 1);
+  E.summary = E.summary.trim();
+  // 今の種類・中分類で使わない項目や空欄を取り除く
+  const spec = {};
+  for (const f of visibleFields(E.cat, E.sub)) { const v = E.spec[f.k]; if (hasVal(v)) spec[f.k] = Array.isArray(v) ? v : String(v).trim(); }
+  E.spec = spec;
+  const kept = E.sessions.filter(s => s.serve.trim() || s.rating || s.comment.trim() || s.place || s.placeName.trim());
+  E.sessions = kept;
   E.updatedAt = Date.now();
-  try {
-    await dbPut(E);
-  } catch (err) {
-    toast('保存に失敗しました。ストレージの空き容量を確認してください', 4000); console.error(err); return;
-  }
+  try { await dbPut(E); } catch (err) { toast('保存に失敗しました。ストレージの空き容量を確認してください', 4000); console.error(err); return; }
   const i = notes.findIndex(n => n.id === E.id);
   if (i >= 0) notes[i] = E; else notes.push(E);
   await clearDraft();
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+  if (F.cat !== E.cat) { F.cat = E.cat; F.sub = 'all'; F.tags = []; saveView(); }
   const id = E.id; E = null;
   toast('保存しました');
   go('#/n/' + id, true);
@@ -681,22 +1120,21 @@ const isStandalone = () => window.matchMedia('(display-mode: standalone)').match
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 async function renderBackup() {
+  setTint(null);
   document.title = 'バックアップ - テイスティングノート';
-  let usage = '', persisted = null;
-  const pre = await metaGet('preMigrationBackup').catch(() => null);
+  let usage = '';
   try { const e = await navigator.storage?.estimate?.(); if (e?.usage != null) usage = (e.usage / 1048576).toFixed(1) + ' MB'; } catch (_) {}
-  try { persisted = await navigator.storage?.persisted?.(); } catch (_) {}
-  app.innerHTML = `
+  const perCat = CATS.map(c => [c.label, notes.filter(n => n.cat === c.k).length]).filter(([, k]) => k).map(([l, k]) => `${l} ${k}`).join(' ・ ');
+  app.innerHTML = `<div class="narrow">
   <header class="top">
     <button class="back" data-act="back-list">${ICON_BACK}一覧</button>
     <h1 style="font-size:17px">バックアップ</h1>
   </header>
   <div class="section"><h2>この端末のデータ</h2>
-    <div class="stat"><span><b>${notes.length}</b>件</span>${usage ? `<span><b>${esc(usage)}</b>使用</span>` : ''}</div>
+    <div class="stat"><span><b>${notes.length}</b>銘柄</span>${usage ? `<span><b>${esc(usage)}</b>使用</span>` : ''}</div>
+    ${perCat ? `<p class="muted">${esc(perCat)}</p>` : ''}
     <p class="muted">最終バックアップ：${lastBackup ? new Date(lastBackup).toLocaleString('ja-JP') : 'なし'}</p>
-    ${persisted === false ? '<p class="muted">ブラウザの自動削除保護は未設定です。ノートを保存すると要求されます。</p>' : ''}
   </div>
-
   <div class="section"><h2>書き出し</h2>
     <p>データはこの端末のブラウザ内だけに保存され、同期されません。定期的にファイルへ書き出して保管してください。</p>
     <div class="btn-col">
@@ -704,7 +1142,6 @@ async function renderBackup() {
       <button class="btn" data-act="exp-csv">CSVで書き出す（Excel等で閲覧用・写真なし）</button>
     </div>
   </div>
-
   <div class="section"><h2>読み込み</h2>
     <p>JSONバックアップから復元します。別の端末への引っ越しにも使えます。</p>
     <div class="btn-col">
@@ -714,22 +1151,22 @@ async function renderBackup() {
     <input class="hidden-file" type="file" id="importInput" accept=".json,application/json">
     <p class="muted">「統合」は同じノートがあれば新しい方を残し、無いものを追加します。</p>
   </div>
-
-  ${pre ? `<div class="section"><h2>統合前のデータ</h2>
-    <p>${new Date(pre.at).toLocaleString('ja-JP')}に、同じ銘柄のノートを1ページへ統合しました。統合前の${pre.notes.length}件をそのまま保管しています。</p>
-    <div class="btn-col">
-      <button class="btn" data-act="exp-pre">統合前のデータを書き出す（JSON）</button>
-      <button class="btn danger" data-act="del-pre">保管データを削除する</button>
-    </div>
-    <p class="muted">問題なく使えることを確認できたら削除して構いません（写真を含むため容量を使います）。</p></div>` : ''}
-
+  <div class="section"><h2>表示設定</h2>
+    <div class="field" style="max-width:240px;margin-bottom:6px"><label for="shotMl">1ショットの量(ml)</label><input type="text" id="shotMl" inputmode="numeric" value="${shotMl}"></div>
+    <p class="muted">ボトル価格と容量から「1ショットあたりの価格」を計算するときに使います。</p>
+  </div>
+  <div class="section"><h2>リセット</h2>
+    <p>この端末のノートをすべて削除します。元に戻せないため、先にJSONで書き出しておいてください。</p>
+    <div class="btn-col"><button class="btn danger" data-act="wipe">すべてのノートを削除</button></div>
+  </div>
   ${isStandalone() ? '' : `<div class="section"><h2>アプリとして使う</h2>
     ${deferredInstall ? '<div class="btn-col" style="margin-bottom:10px"><button class="btn" data-act="install">このPCにインストール</button></div>' : ''}
     <ul>
       <li>iPad：Safariで開き、共有ボタン →「ホーム画面に追加」</li>
       <li>Windows：Edge/Chromeのアドレスバー右のインストールアイコン</li>
     </ul>
-    <p class="muted">iPadではSafariのタブとホーム画面のアプリでデータが別々に保存されます。ホーム画面に追加してから記録を始めるのがおすすめです。</p></div>`}`;
+    <p class="muted">iPadではSafariのタブとホーム画面のアプリでデータが別々に保存されます。</p></div>`}
+  </div>`;
   window.scrollTo(0, 0);
 }
 
@@ -749,83 +1186,37 @@ async function deliverFile(blob, filename) {
 const stamp = () => today().replace(/-/g, '');
 
 async function exportJSON() {
-  const data = { app: 'tasting-notes', version: 2, exportedAt: new Date().toISOString(), customTags, notes };
+  const data = { app: 'tasting-notes', version: 9, exportedAt: new Date().toISOString(), customTags, customCocktails, notes };
   const ok = await deliverFile(new Blob([JSON.stringify(data)], { type: 'application/json' }), `tasting-notes_${stamp()}.json`);
   if (ok) { lastBackup = Date.now(); await metaSet('lastBackup', lastBackup).catch(() => {}); toast('書き出しました'); if ((location.hash || '').startsWith('#/backup')) renderBackup(); }
 }
 function exportCSV() {
-  const head = ['種類', '銘柄名', '蒸留所・ブランド', 'タイプ', '産地', '度数', '熟成年数', '価格', '色', '香り', '味わい', '余韻', 'タグ', '飲み方', '日付', '場所', '店名・場所メモ', 'コメント'];
+  const head = ['種類', '中分類', '銘柄名', '生産者', 'ひとこと', '度数', '容量(ml)', '価格', `1ショット(${shotMl}ml)価格`, '詳細', '色', '香り', '味わい', '余韻', 'タグ', '飲み方', 'おすすめ度', '日付', '場所', '店名・場所メモ', 'コメント'];
   const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
   const rows = [];
-  for (const n of sortedNotes()) {
-    const base = [CATS[n.category], n.name, n.brand, n.type, n.region, n.abv, n.age, n.price, n.color, n.nose, n.palate, n.finish, n.tags.join('・')];
+  for (const c of CATS) for (const n of sortNotes(notes.filter(x => x.cat === c.k))) {
+    const detail = visibleFields(n.cat, n.sub).filter(f => hasVal(specVal(n, f.k))).map(f => `${f.label}:${fmtField(f, specVal(n, f.k))}`).join(' / ');
+    const base = [c.label, subLabel(n.cat, n.sub), n.name, n.producer, n.summary, n.abv, n.volume, n.price, shotPrice(n) ?? '', detail, n.color, n.nose, n.palate, n.finish, n.tags.join('・')];
     const ss = latestSessions(n);
-    if (!ss.length) rows.push([...base, '', '', '', '', '']);
-    ss.forEach(x => rows.push([...base, x.serve, x.date, x.place, x.placeName, x.comment]));
+    if (!ss.length) rows.push([...base, '', '', '', '', '', '']);
+    ss.forEach(s => rows.push([...base, s.serve, s.rating ? RATE[s.rating].sym + RATE[s.rating].label : '', s.date, s.place, s.placeName, s.comment]));
   }
   const csv = '﻿' + [head, ...rows].map(r => r.map(q).join(',')).join('\r\n');
   deliverFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `tasting-notes_${stamp()}.csv`).then(ok => ok && toast('書き出しました'));
 }
-
-/* 取り込み用の整形。旧形式(sessionsなし)のノートは _legacy を付けて後で銘柄ごとに統合する */
-function cleanImported(o) {
-  if (!o || typeof o !== 'object' || !o.id || !o.name) return null;
-  const n = { id: String(o.id) };
-  for (const k of FIELDS) n[k] = String(o[k] ?? '');
-  if (!CATS[n.category]) n.category = 'other';
-  n.tags = Array.isArray(o.tags) ? o.tags.map(String).filter(Boolean) : [];
-  const img = v => (typeof v === 'string' && v.startsWith('data:image/') ? v : '');
-  n.photo = img(o.photo); n.thumb = img(o.thumb);
-  n.createdAt = Number(o.createdAt) || Date.now();
-  n.updatedAt = Number(o.updatedAt) || n.createdAt;
-  if (Array.isArray(o.sessions)) n.sessions = o.sessions.map(cleanSession);
-  else { n.sessions = [cleanSession({ serve: o.serve, date: o.date, place: o.place, placeName: o.placeName, comment: o.overall })]; n._legacy = true; }
-  return n;
-}
-/* 旧形式ノートを「同じ種類・同じ銘柄名」で1つにまとめる */
-function groupLegacy(list) {
-  const out = list.filter(n => !n._legacy);
-  const groups = new Map();
-  for (const n of list.filter(n => n._legacy)) {
-    const key = n.category + '|' + norm(n.name);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(n);
-  }
-  for (const g of groups.values()) out.push(mergeGroup(g));
-  return out;
-}
-function mergeGroup(g) {
-  const byNew = [...g].sort((a, b) => b.updatedAt - a.updatedAt);
-  const chrono = [...g].sort((a, b) => (a.sessions[0].date || '').localeCompare(b.sessions[0].date || '') || a.createdAt - b.createdAt);
-  const base = [...g].sort((a, b) => a.createdAt - b.createdAt)[0];   // 最初に作ったノートのIDを引き継ぐ(端末間で同じIDになる)
-  const m = { id: base.id, createdAt: base.createdAt, updatedAt: byNew[0].updatedAt, category: base.category, photo: '', thumb: '' };
-  for (const k of ['name', 'brand', 'type', 'region', 'abv', 'age', 'price']) m[k] = (byNew.find(n => n[k].trim()) || byNew[0])[k];
-  for (const k of ['color', 'nose', 'palate', 'finish']) {
-    const seen = new Set(), items = [];
-    for (const n of chrono) { const v = n[k].trim(); if (v && !seen.has(v)) { seen.add(v); items.push({ v, s: n.sessions[0] }); } }
-    // ノートごとに内容が違う場合は、失わないよう【日付 飲み方】付きで並べる
-    m[k] = items.length <= 1 ? (items[0]?.v || '') : items.map(({ v, s }) => { const label = [fmtDate(s.date), s.serve].filter(Boolean).join(' '); return label ? `【${label}】${v}` : v; }).join('\n');
-  }
-  const ph = byNew.find(n => n.photo);
-  if (ph) { m.photo = ph.photo; m.thumb = ph.thumb; }
-  m.tags = uniq(chrono.flatMap(n => n.tags));
-  m.sessions = chrono.flatMap(n => n.sessions);
-  return m;
-}
-
 async function importFile(file, mode) {
   let data;
   try { data = JSON.parse(await file.text()); } catch { return toast('JSONとして読み込めませんでした', 3500); }
   if (!data || !Array.isArray(data.notes)) return toast('このアプリのバックアップファイルではありません', 3500);
-  const incoming = groupLegacy(data.notes.map(cleanImported).filter(Boolean));
-  if (!incoming.length) return toast('読み込めるノートがありませんでした', 3500);
+  const incoming = data.notes.map(cleanNote).filter(Boolean);
+  if (!incoming.length) return toast(Number(data.version) < 4 ? '以前のバージョン(v1〜v3)のバックアップには対応していません' : '読み込めるノートがありませんでした', 3500);
+  const inTags = Array.isArray(data.customTags) ? data.customTags.map(String) : [];
+  const inCk = data.customCocktails && typeof data.customCocktails === 'object' ? data.customCocktails : {};
   if (mode === 'replace') {
-    if (!await confirmDialog(`いまの${notes.length}件をすべて削除し、バックアップの${incoming.length}件に置き換えます。よろしいですか？`, '置き換える', true)) return;
+    if (!await confirmDialog(`いまの${notes.length}銘柄をすべて削除し、バックアップの${incoming.length}銘柄に置き換えます。よろしいですか？`, '置き換える', true)) return;
     await dbClear(); await dbPutMany(incoming);
-    notes = incoming;
-    customTags = uniq((data.customTags || []).map(String));
-    await metaSet('customTags', customTags).catch(() => {});
-    toast(`${incoming.length}件に置き換えました`);
+    notes = incoming; customTags = uniq(inTags); customCocktails = {};
+    toast(`${incoming.length}銘柄に置き換えました`);
   } else {
     const byId = new Map(notes.map(n => [n.id, n]));
     let added = 0, updated = 0; const write = [];
@@ -836,48 +1227,89 @@ async function importFile(file, mode) {
     }
     if (write.length) await dbPutMany(write);
     notes = [...byId.values()];
-    customTags = uniq([...customTags, ...(data.customTags || []).map(String)]);
-    await metaSet('customTags', customTags).catch(() => {});
+    customTags = uniq([...customTags, ...inTags]);
     toast(`追加${added}件・更新${updated}件`);
   }
+  for (const [k, v] of Object.entries(inCk)) if (SC[k] && Array.isArray(v)) customCocktails[k] = uniq([...(customCocktails[k] || []), ...v.map(String)]);
+  await metaSet('customTags', customTags).catch(() => {});
+  await metaSet('customCocktails', customCocktails).catch(() => {});
   renderBackup();
 }
 
 /* ============================================================
    イベント
    ============================================================ */
-function $(s, r = document) { return r.querySelector(s); }
-
+function syncSpecChips(k) {
+  const v = E.spec[k];
+  document.querySelectorAll(`[data-k="${k}"][data-act^="spec-"]`).forEach(x => x.setAttribute('aria-pressed', String(Array.isArray(v) ? v.includes(x.dataset.v) : v === x.dataset.v)));
+}
+function addManyValue(k) {
+  const inp = document.querySelector(`[data-many-input="${k}"]`); const t = inp?.value.trim();
+  if (!t) return;
+  const arr = Array.isArray(E.spec[k]) ? E.spec[k] : [];
+  if (!arr.includes(t)) E.spec[k] = [...arr, t];
+  $('#specBlock').innerHTML = specBlockHTML();
+  document.querySelector(`[data-many-input="${k}"]`)?.focus();
+  scheduleDraft();
+}
+function addCustomTag() {
+  const inp = $('#newTag'); const t = inp.value.trim();
+  if (!t) return;
+  if (!E.tags.includes(t)) E.tags.push(t);
+  if (!customTags.includes(t)) { customTags.push(t); metaSet('customTags', customTags).catch(() => {}); }
+  $('#tagPicker').innerHTML = tagPickerHTML();
+  $('#newTag').focus();
+  scheduleDraft();
+}
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
   const act = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
   switch (act) {
-    case 'open-note': listScroll = window.scrollY; return;         // リンクの通常遷移に任せる
+    case 'open-note': listScroll = window.scrollY; return;
     case 'new': return go('#/new');
     case 'backup': listScroll = window.scrollY; return go('#/backup');
     case 'back-list': return go('#/');
     case 'edit': return go('#/edit/' + id);
     case 'add-session': return go('#/edit/' + id + '/add');
+    case 'add-serve': return go('#/edit/' + id + '/add/' + encodeURIComponent(b.dataset.serve));
+    case 'view': F.view = v; saveView(); document.querySelectorAll('[data-act="view"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v))); updateList(); return;
+    case 'dmode': F.dmode = v; saveView(); { const y = window.scrollY; renderDetail(id); window.scrollTo(0, y); } return;
+    case 'to-top': window.scrollTo({ top: 0, behavior: 'smooth' }); return;
     case 'del': {
       const n = notes.find(x => x.id === id);
       if (n && await confirmDialog(`「${n.name}」のノートを削除します。元に戻せません。`, '削除する', true)) {
         await dbDel(id); notes = notes.filter(x => x.id !== id); toast('削除しました'); go('#/', true);
       } return;
     }
-    case 'cat': F.cat = v; renderList(); return;
+    case 'cat':
+      F.cat = v; F.sub = 'all'; F.tags = []; if (!b.dataset.keepq) F.q = ''; listScroll = 0; saveView(); renderList(); return;
+    case 'sub': F.sub = v; saveView(); updateList(); return;
     case 'tagpanel': F.tagPanel = !F.tagPanel; updateList(); return;
     case 'ftag': F.tags = F.tags.includes(v) ? F.tags.filter(t => t !== v) : [...F.tags, v]; updateList(); return;
     case 'cleartags': F.tags = []; updateList(); return;
-    case 'clearfilters': Object.assign(F, { q: '', cat: 'all', tags: [] }); renderList(); return;
+    case 'legend': F.legend = !F.legend; updateList(); return;
+    case 'clearfilters': Object.assign(F, { q: '', sub: 'all', tags: [] }); renderList(); return;
 
-    case 'ed-chip': {
-      const f = b.dataset.f;
-      E[f] = (E[f] === v && !b.dataset.req) ? '' : v;
-      document.querySelectorAll(`[data-act="ed-chip"][data-f="${f}"]`).forEach(x => x.setAttribute('aria-pressed', String(E[f] === x.dataset.v)));
-      if (f === 'category') { $('#tagPicker').innerHTML = tagPickerHTML(); $('#dl-type').innerHTML = typeOptionsHTML(); }
-      scheduleDraft(); return;
+    case 'ed-cat':
+      if (E.cat === v) return;
+      E.cat = v; E.sub = ''; renderEditor(); scheduleDraft(); return;
+    case 'ed-sub':
+      E.sub = v;
+      document.querySelectorAll('[data-act="ed-sub"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
+      $('#specBlock').innerHTML = specBlockHTML(); scheduleDraft(); return;
+    case 'spec-one': {
+      const k = b.dataset.k;
+      E.spec[k] = E.spec[k] === v ? '' : v;
+      const inp = document.querySelector(`input[data-spec="${k}"]`); if (inp) inp.value = E.spec[k];
+      syncSpecChips(k); scheduleDraft(); return;
     }
+    case 'spec-many': {
+      const k = b.dataset.k, arr = Array.isArray(E.spec[k]) ? E.spec[k] : [];
+      E.spec[k] = arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
+      syncSpecChips(k); scheduleDraft(); return;
+    }
+    case 'spec-many-add': addManyValue(b.dataset.k); return;
     case 'ed-tag':
       E.tags = E.tags.includes(v) ? E.tags.filter(t => t !== v) : [...E.tags, v];
       b.setAttribute('aria-pressed', String(E.tags.includes(v)));
@@ -886,76 +1318,62 @@ document.addEventListener('click', async e => {
     case 'sess-chip': {
       const i = +b.dataset.si, f = b.dataset.f, cur = E.sessions[i];
       cur[f] = cur[f] === v ? '' : v;
-      if (f === 'serve') { const inp = b.closest('.sess').querySelector('[data-sf="serve"]'); if (inp) inp.value = cur.serve; }
       syncSession(i); scheduleDraft(); return;
     }
     case 'sess-del': {
+      e.preventDefault();
       const i = +b.dataset.si, cur = E.sessions[i];
       if ((cur.comment.trim() || cur.serve.trim()) && !await confirmDialog('この飲み方の記録を削除します。よろしいですか？', '削除する', true)) return;
       E.sessions.splice(i, 1); renderSessions(); scheduleDraft(); return;
     }
     case 'ed-add-sess': {
-      appendSession(); renderSessions(); scheduleDraft();
-      const els = document.querySelectorAll('#sessions .sess'); els[els.length - 1]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      E.sessions.push(newSession(E.sessions[E.sessions.length - 1])); renderSessions(); scheduleDraft();
+      document.querySelectorAll('#sessions .sess')[E.sessions.length - 1]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
     case 'dup-open': await clearDraft(); E = null; go('#/edit/' + id + '/add'); return;
-    case 'exp-pre': {
-      const pre = await metaGet('preMigrationBackup').catch(() => null);
-      if (!pre) return;
-      const data = { app: 'tasting-notes', version: 1, exportedAt: new Date(pre.at).toISOString(), customTags, notes: pre.notes };
-      if (await deliverFile(new Blob([JSON.stringify(data)], { type: 'application/json' }), `tasting-notes_before-merge_${stamp()}.json`)) toast('書き出しました');
-      return;
-    }
-    case 'del-pre':
-      if (await confirmDialog('統合前のデータの保管コピーを削除します。よろしいですか？', '削除する', true)) { await metaDel('preMigrationBackup'); renderBackup(); }
-      return;
     case 'ed-photo': $('#photoInput').click(); return;
     case 'ed-photo-rm': E.photo = ''; E.thumb = ''; $('#photoBox').innerHTML = photoBoxHTML(); scheduleDraft(); return;
     case 'ed-save': return saveNote();
     case 'ed-cancel': {
-      const dirty = JSON.stringify(E) !== E0;
-      if (dirty && !await confirmDialog('入力中の内容は破棄されます。よろしいですか？', '破棄する', true)) return;
+      if (JSON.stringify(E) !== E0 && !await confirmDialog('入力中の内容は破棄されます。よろしいですか？', '破棄する', true)) return;
       await clearDraft();
-      const wasEdit = notes.some(n => n.id === E.id); const id2 = E.id; E = null;
-      return go(wasEdit ? '#/n/' + id2 : '#/', true);
+      const was = isEditing(), id2 = E.id; E = null;
+      return go(was ? '#/n/' + id2 : '#/', true);
     }
-    case 'ed-discard': {
-      await clearDraft(); E = JSON.parse(E0); draftRestored = false;
-      renderEditor(notes.some(n => n.id === E.id)); toast('下書きを破棄しました'); return;
-    }
+    case 'ed-discard': await clearDraft(); E = JSON.parse(E0); draftRestored = false; renderEditor(); toast('下書きを破棄しました'); return;
+
     case 'exp-json': return exportJSON();
     case 'exp-csv': return exportCSV();
     case 'imp': { const inp = $('#importInput'); inp.dataset.mode = b.dataset.mode; inp.value = ''; inp.click(); return; }
+    case 'wipe':
+      if (notes.length && await confirmDialog(`${notes.length}銘柄のノートをすべて削除します。元に戻せません。`, 'すべて削除', true)) { await dbClear(); notes = []; toast('削除しました'); renderBackup(); }
+      return;
     case 'install':
       if (deferredInstall) { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; renderBackup(); }
       return;
   }
 });
 
-function addCustomTag() {
-  const inp = $('#newTag'); const t = inp.value.trim();
-  if (!t) return;
-  if (!E.tags.includes(t)) E.tags.push(t);
-  if (!PRESET_TAGS.has(t) && !customTags.includes(t)) { customTags.push(t); metaSet('customTags', customTags).catch(() => {}); }
-  $('#tagPicker').innerHTML = tagPickerHTML();
-  $('#newTag').focus();
-  scheduleDraft();
-}
-
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'q') { F.q = t.value; updateList(); return; }
-  if (E && t.dataset.si !== undefined && t.dataset.sf) {
+  if (!E || !t.closest('#editor')) return;
+  if (t.dataset.si !== undefined && t.dataset.sf) {
     const i = +t.dataset.si; E.sessions[i][t.dataset.sf] = t.value;
     if (t.dataset.sf === 'serve') syncSession(i);
-    scheduleDraft(); return;
-  }
-  if (E && t.name && t.closest('#editor')) { E[t.name] = t.value; if (t.name === 'name') updateDupHint(); scheduleDraft(); }
+  } else if (t.dataset.spec) { E.spec[t.dataset.spec] = t.value; syncSpecChips(t.dataset.spec); }
+  else if (t.name) { E[t.name] = t.value; if (t.name === 'name') updateDupHint(); if (t.name === 'price' || t.name === 'volume') updateShotCalc(); }
+  else return;
+  scheduleDraft();
 });
 document.addEventListener('change', async e => {
   const t = e.target;
-  if (t.id === 'sort') { F.sort = t.value; updateList(); }
+  if (t.id === 'sort') { F.sort = t.value; saveView(); updateList(); }
+  else if (t.id === 'shotMl') {
+    const v = Math.round(toNum(t.value));
+    if (v > 0) { shotMl = v; await metaSet('shotMl', v).catch(() => {}); toast(`1ショットを${v}mlで計算します`); } else t.value = shotMl;
+  }
   else if (t.id === 'photoInput' && t.files[0]) {
     try { Object.assign(E, await processPhoto(t.files[0])); $('#photoBox').innerHTML = photoBoxHTML(); scheduleDraft(); }
     catch (err) { toast(err.message, 3500); }
@@ -963,41 +1381,43 @@ document.addEventListener('change', async e => {
   else if (t.id === 'importInput' && t.files[0]) importFile(t.files[0], t.dataset.mode);
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.id === 'newTag') { e.preventDefault(); addCustomTag(); }
-  if (e.key === 'Enter' && e.target.matches('#editor input[type=text]')) e.preventDefault();
+  if (e.key !== 'Enter' || e.isComposing) return;
+  const t = e.target;
+  if (t.id === 'newTag') { e.preventDefault(); addCustomTag(); }
+  else if (t.dataset?.manyInput) { e.preventDefault(); addManyValue(t.dataset.manyInput); }
+  else if (t.matches('#editor input[type=text]')) e.preventDefault();
 });
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+/* 上へ戻るボタンと、固定見出しの状態をスクロールに合わせて更新 */
+const toTopBtn = document.createElement('button');
+toTopBtn.className = 'to-top'; toTopBtn.dataset.act = 'to-top'; toTopBtn.setAttribute('aria-label', 'ページの先頭へ'); toTopBtn.title = 'ページの先頭へ';
+toTopBtn.innerHTML = icon('up');
+document.body.appendChild(toTopBtn);
+let scrollTick = false;
+window.addEventListener('scroll', () => {
+  if (scrollTick) return; scrollTick = true;
+  requestAnimationFrame(() => { scrollTick = false; toTopBtn.classList.toggle('show', window.scrollY > 500); measureHead(); });
+}, { passive: true });
+window.addEventListener('resize', () => measureHead());
 
 /* ---------- 起動 ---------- */
 (async function init() {
-  let migrated = null;
   try {
     db = await openDB();
-    const raw = await dbAll();
-    const legacyRaw = raw.filter(n => !Array.isArray(n.sessions));
-    const modern = raw.filter(n => Array.isArray(n.sessions));
-    notes = modern;
-    if (legacyRaw.length) {
-      // 旧形式(1ノート=1回の記録)を、同じ銘柄名ごとに1ページへ統合する
-      try { await metaSet('preMigrationBackup', { at: Date.now(), notes: legacyRaw }); } catch (e) { console.warn('pre-migration backup failed', e); }
-      const conv = legacyRaw.map(cleanImported);
-      const okRaw = legacyRaw.filter((_, i) => conv[i]);
-      const merged = groupLegacy(conv.filter(Boolean));
-      await tx('notes', 'readwrite', s => { okRaw.forEach(n => s.delete(n.id)); merged.forEach(n => s.put(n)); });
-      notes = [...modern, ...merged];
-      migrated = { from: okRaw.length, to: merged.length };
-    }
-    notes = notes.map(normalizeNote);
+    notes = (await dbAll()).map(cleanNote).filter(Boolean);
+    shotMl = (await metaGet('shotMl')) || 30;
     customTags = (await metaGet('customTags')) || [];
+    customCocktails = (await metaGet('customCocktails')) || {};
     lastBackup = (await metaGet('lastBackup')) || 0;
   } catch (err) {
     console.error(err);
     app.innerHTML = '<div class="empty"><p>データの保存領域を開けませんでした。<br>プライベートブラウズ中や、ブラウザの設定でストレージが無効になっている可能性があります。</p></div>';
     return;
   }
+  if (!SC[F.cat]) F.cat = 'whisky';
+  if (F.sub !== 'all' && !SC[F.cat].subs.some(s => s[0] === F.sub)) F.sub = 'all';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
   route();
-  if (migrated) toast(migrated.from === migrated.to ? '新しい形式にデータを更新しました' : `${migrated.from}件のノートを${migrated.to}銘柄に統合しました`, 5000);
 })();
 </script>
 </body>

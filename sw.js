@@ -1,6 +1,6 @@
 // Service Worker: アプリ本体をキャッシュしてオフラインでも動くようにする。
 // index.html などを更新して再公開したときは、下の VERSION を上げてください。
-const VERSION = 'v3';
+const VERSION = 'v9';
 const CACHE = 'tasting-notes-' + VERSION;
 const ASSETS = [
   './',
